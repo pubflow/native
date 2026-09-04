@@ -1,0 +1,70 @@
+{
+  "app": {
+    "tagline": "Páginas + API en un proceso"
+  },
+  "nav": {
+    "dashboard": "Panel",
+    "login": "Entrar",
+    "logout": "Salir"
+  },
+  "login": {
+    "title": "Bienvenido",
+    "subtitle": "Usa tu cuenta Flowless. El mismo auth de cliente que Next y TanStack.",
+    "email": "Correo",
+    "password": "Contraseña",
+    "error": "No se pudo entrar. Revisa la URL de Flowless y las credenciales.",
+    "noAccount": "¿Sin cuenta?"
+  },
+  "register": {
+    "title": "Crea tu cuenta",
+    "subtitle": "Regístrate en Flowless y luego entra.",
+    "name": "Nombre",
+    "submit": "Crear cuenta",
+    "success": "Cuenta creada. Inicia sesión.",
+    "error": "No se pudo crear la cuenta."
+  },
+  "auth": {
+    "backToLogin": "Volver a entrar"
+  },
+  "home": {
+    "welcome": {
+      "title": "Bienvenido a Pubflow Native",
+      "subtitle": "Páginas React y APIs Hono comparten un solo fetch. Los secretos y DATABASE_URL se quedan en el servidor.",
+      "editTitle": "Empieza a personalizar",
+      "editSubtitle": "UI en app/pages y secretos en app/api.",
+      "steps": {
+        "home": "Edita app/pages/index.tsx para cambiar esta pantalla.",
+        "auth": "Abre /login para probar autenticación Flowless.",
+        "config": "Actualiza app/lib/pubflow-config.ts o variables PUBFLOW_PUBLIC_* / VITE_*."
+      }
+    }
+  },
+  "dashboard": {
+    "title": "Panel",
+    "subtitle": "Página protegida",
+    "welcome": "Hola",
+    "signedIn": "Sesión activa",
+    "apiBase": "URL Flowless",
+    "userData": "Sesión + /api/users",
+    "modules": "El navegador llama a /api/* del mismo origen con X-Session-ID. requireAuth() valida contra Flowless.",
+    "cards": {
+      "auth": "Autenticación",
+      "authText": "El estado de sesión lo maneja @pubflow/react.",
+      "deploy": "Cloudflare primero",
+      "deployText": "bun run deploy:cf publica páginas y API como un Worker."
+    }
+  },
+  "actions": {
+    "openDashboard": "Abrir panel",
+    "goLogin": "Ir a entrar"
+  },
+  "theme": {
+    "light": "Claro",
+    "dark": "Oscuro"
+  },
+  "status": {
+    "protected": "Protegido",
+    "loading": "Cargando",
+    "redirecting": "Redirigiendo al login"
+  }
+}

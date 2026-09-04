@@ -1,0 +1,83 @@
+{
+  "name": "@pubflow/native",
+  "version": "0.1.0",
+  "description": "Pubflow Native — React pages and Hono APIs in one process.",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pubflow/native.git",
+    "directory": "library"
+  },
+  "homepage": "https://github.com/pubflow/native",
+  "bugs": {
+    "url": "https://github.com/pubflow/native/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "bun test src",
+    "prepublishOnly": "bun test src && tsc --noEmit"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./vite": {
+      "types": "./src/vite.ts",
+      "import": "./src/vite.ts",
+      "default": "./src/vite.ts"
+    },
+    "./pages": {
+      "types": "./src/pages.ts",
+      "import": "./src/pages.ts",
+      "default": "./src/pages.ts"
+    },
+    "./api": {
+      "types": "./src/api.ts",
+      "import": "./src/api.ts",
+      "default": "./src/api.ts"
+    },
+    "./config": {
+      "types": "./src/config.ts",
+      "import": "./src/config.ts",
+      "default": "./src/config.ts"
+    },
+    "./env": {
+      "types": "./src/env.ts",
+      "import": "./src/env.ts",
+      "default": "./src/env.ts"
+    }
+  },
+  "peerDependencies": {
+    "@tanstack/react-router": "^1.120.0",
+    "hono": "^4.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "vite": ">=6.0.0"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.0",
+    "@vitejs/plugin-react": "^5.0.0"
+  },
+  "devDependencies": {
+    "@tanstack/react-router": "^1.131.0",
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "hono": "^4.9.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "typescript": "^5.8.0",
+    "vite": "^7.1.0"
+  }
+}
