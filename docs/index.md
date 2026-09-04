@@ -1,6 +1,6 @@
 # Pubflow Native
 
-Pubflow Native is the TypeScript fullstack path: React pages and Hono APIs in **one process**. One repo, one `dev`, one deploy.
+Pubflow Native is a **full-stack TypeScript framework**: React pages and Hono APIs in **one process**. Anyone can use it — `npx degit pubflow/native/starter my-app`, or `bun add @pubflow/native`. Pubflow auth is optional.
 
 - [Why Native](./why.md)
 - [Create](./create.md)

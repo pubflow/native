@@ -1,0 +1,37 @@
+import { defineConfig } from 'tsup'
+
+export default defineConfig({
+  entry: {
+    index: 'src/index.ts',
+    vite: 'src/vite.ts',
+    pages: 'src/pages.ts',
+    api: 'src/api.ts',
+    config: 'src/config.ts',
+    env: 'src/env.ts',
+    'node-entry': 'src/node-entry.ts',
+    'worker-entry': 'src/worker-entry.ts',
+  },
+  format: ['esm'],
+  target: 'node18',
+  platform: 'node',
+  splitting: false,
+  sourcemap: true,
+  clean: true,
+  dts: false,
+  treeshake: false,
+  external: [
+    'vite',
+    'react',
+    'react-dom',
+    'react-dom/server',
+    'react/jsx-runtime',
+    'hono',
+    '@tanstack/react-router',
+    '@hono/node-server',
+    '@hono/node-server/serve-static',
+    '@vitejs/plugin-react',
+    'virtual:pubflow-native/server',
+    'virtual:pubflow-native/router',
+    'virtual:pubflow-native/client',
+  ],
+})

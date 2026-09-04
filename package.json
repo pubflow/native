@@ -2,7 +2,7 @@
   "name": "pubflow-native",
   "private": true,
   "version": "0.1.0",
-  "description": "Pubflow Native — fullstack TypeScript (React pages + Hono API in one process).",
+  "description": "Full-stack TypeScript framework: React pages and Hono APIs in one process.",
   "workspaces": [
     "library",
     "starter",
@@ -10,6 +10,8 @@
     "examples/custom-hono-server"
   ],
   "scripts": {
+    "build:library": "bun run --cwd library build",
+    "postinstall": "bun run --cwd library build",
     "test": "bun test library/src && bun run test:smoke",
     "test:unit": "bun test library/src",
     "test:smoke": "bun scripts/smoke.mjs",

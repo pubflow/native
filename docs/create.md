@@ -1,5 +1,16 @@
 # Create
 
+Start from **[starter/](https://github.com/pubflow/native/tree/master/starter)** only — not the whole `pubflow/native` repo.
+
+```bash
+npx degit pubflow/native/starter my-app
+cd my-app
+bun install
+bun run dev
+```
+
+When the CLI is updated:
+
 ```bash
 pubflow create native my-app
 cd my-app

@@ -1,7 +1,7 @@
 {
   "name": "@pubflow/native",
-  "version": "0.1.0",
-  "description": "Pubflow Native — React pages and Hono APIs in one process.",
+  "version": "0.1.1",
+  "description": "Full-stack TypeScript framework: React pages and Hono APIs in one process. Universal — not locked to Pubflow apps.",
   "type": "module",
   "license": "MIT",
   "repository": {
@@ -17,45 +17,47 @@
     "access": "public"
   },
   "files": [
+    "dist",
     "src",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
+    "build": "tsup",
     "typecheck": "tsc --noEmit",
     "test": "bun test src",
-    "prepublishOnly": "bun test src && tsc --noEmit"
+    "prepublishOnly": "bun test src && tsc --noEmit && tsup"
   },
   "exports": {
     ".": {
       "types": "./src/index.ts",
-      "import": "./src/index.ts",
-      "default": "./src/index.ts"
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./vite": {
       "types": "./src/vite.ts",
-      "import": "./src/vite.ts",
-      "default": "./src/vite.ts"
+      "import": "./dist/vite.js",
+      "default": "./dist/vite.js"
     },
     "./pages": {
       "types": "./src/pages.ts",
-      "import": "./src/pages.ts",
-      "default": "./src/pages.ts"
+      "import": "./dist/pages.js",
+      "default": "./dist/pages.js"
     },
     "./api": {
       "types": "./src/api.ts",
-      "import": "./src/api.ts",
-      "default": "./src/api.ts"
+      "import": "./dist/api.js",
+      "default": "./dist/api.js"
     },
     "./config": {
       "types": "./src/config.ts",
-      "import": "./src/config.ts",
-      "default": "./src/config.ts"
+      "import": "./dist/config.js",
+      "default": "./dist/config.js"
     },
     "./env": {
       "types": "./src/env.ts",
-      "import": "./src/env.ts",
-      "default": "./src/env.ts"
+      "import": "./dist/env.js",
+      "default": "./dist/env.js"
     }
   },
   "peerDependencies": {
@@ -77,6 +79,7 @@
     "hono": "^4.9.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "tsup": "^8.5.0",
     "typescript": "^5.8.0",
     "vite": "^7.1.0"
   }

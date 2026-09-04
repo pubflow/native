@@ -17,6 +17,15 @@ const VIRTUAL = {
   client: 'virtual:pubflow-native/client',
 }
 
+const CLIENT_DEV_SCRIPT = '/.pubflow/generated/client.tsx'
+const CLIENT_BUILD_SCRIPT = '/assets/client.js'
+
+function resolveEntry(libraryRoot: string, name: string): string {
+  const js = path.resolve(libraryRoot, `${name}.js`)
+  if (fs.existsSync(js)) return js
+  return path.resolve(libraryRoot, `${name}.ts`)
+}
+
 function loadHtml(root: string): string {
   const built = path.join(root, 'dist', 'client', 'index.html')
   const src = path.join(root, 'index.html')
@@ -32,6 +41,7 @@ function isViteInternal(url = ''): boolean {
     pathname.startsWith('/node_modules') ||
     pathname.startsWith('/.vite') ||
     pathname.startsWith('/__vite') ||
+    pathname.startsWith('/.pubflow/') ||
     pathname.includes('/@fs/') ||
     pathname.includes('/@id/')
   ) {
@@ -45,6 +55,7 @@ function isViteInternal(url = ''): boolean {
 function nativePlugin(options: NativeViteOptions = {}): Plugin {
   let root = options.root || process.cwd()
   let isSsrBuild = false
+  let command: 'build' | 'serve' = 'serve'
 
   const regenerate = (html = '') => generateNative(root, html)
 
@@ -57,12 +68,13 @@ function nativePlugin(options: NativeViteOptions = {}): Plugin {
     },
     config(_config, env) {
       root = options.root || _config.root || root
+      command = env.command
       const ssr = env.isSsrBuild
       regenerate(ssr ? loadHtml(root) : '')
       const gen = generatedDir(root)
       const libraryRoot = path.dirname(fileURLToPath(import.meta.url))
-      const nodeEntry = path.resolve(libraryRoot, 'node-entry.ts')
-      const workerEntry = path.resolve(libraryRoot, 'worker-entry.ts')
+      const nodeEntry = resolveEntry(libraryRoot, 'node-entry')
+      const workerEntry = resolveEntry(libraryRoot, 'worker-entry')
 
       return {
         resolve: {
@@ -81,7 +93,7 @@ function nativePlugin(options: NativeViteOptions = {}): Plugin {
         },
         server: {
           fs: {
-            allow: [root, path.join(root, '.pubflow')],
+            allow: [root, path.join(root, '.pubflow'), libraryRoot],
           },
         },
         appType: 'custom',
@@ -97,7 +109,7 @@ function nativePlugin(options: NativeViteOptions = {}): Plugin {
                   app: path.resolve(gen, 'server.ts'),
                   node: nodeEntry,
                   worker: workerEntry,
-                },
+                } as Record<string, string>,
                 output: {
                   entryFileNames: '[name].js',
                   format: 'es',
@@ -108,7 +120,16 @@ function nativePlugin(options: NativeViteOptions = {}): Plugin {
               outDir: 'dist/client',
               emptyOutDir: true,
               rollupOptions: {
-                input: path.resolve(root, 'index.html'),
+                input: {
+                  index: path.resolve(root, 'index.html'),
+                  client: path.join(gen, 'client.tsx'),
+                } as Record<string, string>,
+                output: {
+                  entryFileNames: (chunk) =>
+                    chunk.name === 'client' ? 'assets/client.js' : 'assets/[name]-[hash].js',
+                  chunkFileNames: 'assets/[name]-[hash].js',
+                  assetFileNames: 'assets/[name]-[hash][extname]',
+                },
               },
             },
       }
@@ -120,7 +141,11 @@ function nativePlugin(options: NativeViteOptions = {}): Plugin {
       if (id === VIRTUAL.server || id === '/@pubflow-native/server.ts') {
         return path.join(generatedDir(root), 'server.ts')
       }
-      if (id === VIRTUAL.client || id === '/@pubflow-native/client.tsx') {
+      if (
+        id === VIRTUAL.client ||
+        id === '/@pubflow-native/client.tsx' ||
+        id === CLIENT_DEV_SCRIPT
+      ) {
         return path.join(generatedDir(root), 'client.tsx')
       }
       return null
@@ -175,14 +200,20 @@ function nativePlugin(options: NativeViteOptions = {}): Plugin {
         })
       }
     },
-    transformIndexHtml() {
-      return [
-        {
-          tag: 'script',
-          attrs: { type: 'module', src: '/@pubflow-native/client.tsx' },
-          injectTo: 'body',
-        },
-      ]
+    transformIndexHtml: {
+      order: 'post',
+      handler() {
+        return [
+          {
+            tag: 'script',
+            attrs: {
+              type: 'module',
+              src: command === 'build' ? CLIENT_BUILD_SCRIPT : CLIENT_DEV_SCRIPT,
+            },
+            injectTo: 'body',
+          },
+        ]
+      },
     },
     buildStart() {
       regenerate(isSsrBuild ? loadHtml(root) : '')

@@ -1,5 +1,7 @@
 # Adoption
 
+Until `pubflow add pages` / `pubflow add native` ship on npm, follow the recipes on the [root README](../README.md).
+
 ## Existing flowfull-node (Hono)
 
 ```bash
