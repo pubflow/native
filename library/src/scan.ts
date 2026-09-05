@@ -1,5 +1,8 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { toPosix } from './access.ts'
+
+export { actionId, toPosix } from './access.ts'
 
 export type PageKind = 'layout' | 'index' | 'page' | 'error' | 'pending'
 
@@ -34,10 +37,6 @@ export type ActionFile = {
 
 const PAGE_EXT = /\.(tsx|jsx|ts|js)$/
 const API_EXT = /\.(ts|js)$/
-
-export function toPosix(value: string): string {
-  return value.replace(/\\/g, '/')
-}
 
 export function exists(file: string): boolean {
   try {
@@ -91,17 +90,6 @@ function fileToApiMount(rel: string): { mount: string; isMiddleware: boolean } {
     return { mount: '/' + parts.slice(0, -1).join('/'), isMiddleware: true }
   }
   return { mount: '/' + parts.join('/'), isMiddleware: false }
-}
-
-export function actionId(rel: string, exportName: string): string {
-  const parts = toPosix(rel)
-    .replace(API_EXT, '')
-    .split('/')
-    .filter(Boolean)
-  const fileBase = parts[parts.length - 1] || exportName
-  const dirParts = parts.slice(0, -1)
-  if (fileBase === exportName) return [...dirParts, exportName].join('.')
-  return [...parts, exportName].join('.')
 }
 
 export function scanActions(root: string): ActionFile[] {

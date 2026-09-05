@@ -11,6 +11,7 @@ export default defineConfig({
     actions: 'src/actions.ts',
     auth: 'src/auth.ts',
     'node-entry': 'src/node-entry.ts',
+    'bun-entry': 'src/bun-entry.ts',
     'worker-entry': 'src/worker-entry.ts',
   },
   format: ['esm'],

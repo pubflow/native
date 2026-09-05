@@ -1,6 +1,6 @@
 {
   "name": "@pubflow/native",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Full-stack TypeScript framework: React pages and Hono APIs in one process. Universal — not locked to Pubflow apps.",
   "type": "module",
   "license": "MIT",

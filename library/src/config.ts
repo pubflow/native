@@ -1,4 +1,4 @@
-export type NativeRuntime = 'bun' | 'node' | 'cloudflare' | 'deno'
+export type NativeRuntime = 'bun' | 'node' | 'cloudflare'
 
 export type NativeAuthConfig = {
   provider?: 'flowless' | 'none'

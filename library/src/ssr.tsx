@@ -37,7 +37,7 @@ async function loadTemplate(c: Context, indexHtml: string): Promise<string> {
     const file = path.join(root, 'index.html')
     if (fs.existsSync(file)) html = fs.readFileSync(file, 'utf8')
   } catch {
-    // Workers / Deno without fs: caller should pass the built index HTML.
+    // Workers without fs: caller should pass the built index HTML.
   }
   if (vite?.transformIndexHtml) {
     const url = new URL(c.req.url)

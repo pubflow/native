@@ -1,11 +1,10 @@
 import { Hono } from 'hono'
 import type { Context, MiddlewareHandler } from 'hono'
 import { HTTPException } from 'hono/http-exception'
-import { isAnyType, parseAllowedTypes, sessionAllowed, type ActionSession } from './access.ts'
-import { actionId } from './scan.ts'
+import { actionId, isAnyType, parseAllowedTypes, sessionAllowed, type ActionSession } from './access.ts'
 
 export type { ActionSession } from './access.ts'
-export { isAnyType, parseAllowedTypes, sessionAllowed }
+export { isAnyType, parseAllowedTypes, sessionAllowed, actionId, toPosix } from './access.ts'
 
 const SKIP_EXPORTS = new Set(['auth', 'allowedTypes', 'default', 'middleware', 'requireAuth', 'requireRole'])
 
@@ -211,5 +210,3 @@ export function emitActionStub(rel: string, exportNames: string[]): string {
   if (!exportNames.length) lines.push(`export {}`)
   return lines.join('\n') + '\n'
 }
-
-export { actionId }

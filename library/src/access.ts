@@ -6,6 +6,22 @@ export type ActionSession = {
 }
 
 const ANY_TYPES = new Set(['any', 'authenticated', '*'])
+const API_EXT = /\.(ts|js)$/
+
+export function toPosix(value: string): string {
+  return value.replace(/\\/g, '/')
+}
+
+export function actionId(rel: string, exportName: string): string {
+  const parts = toPosix(rel)
+    .replace(API_EXT, '')
+    .split('/')
+    .filter(Boolean)
+  const fileBase = parts[parts.length - 1] || exportName
+  const dirParts = parts.slice(0, -1)
+  if (fileBase === exportName) return [...dirParts, exportName].join('.')
+  return [...parts, exportName].join('.')
+}
 
 export function parseAllowedTypes(value?: string | string[]): string[] {
   if (!value) return []

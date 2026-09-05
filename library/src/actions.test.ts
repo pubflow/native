@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'bun:test'
+import fs from 'node:fs'
+import path from 'node:path'
 import { HTTPException } from 'hono/http-exception'
 import {
   actionId,
@@ -30,6 +32,12 @@ function authModule(session?: ActionSession) {
 }
 
 describe('actionId', () => {
+  it('does not pull node:fs into the actions runtime module', () => {
+    const source = fs.readFileSync(path.join(import.meta.dir, 'actions.ts'), 'utf8')
+    expect(source).not.toContain('node:fs')
+    expect(source).not.toContain("./scan.ts")
+  })
+
   it('uses dir + export when the file is named after the function', () => {
     expect(actionId('posts/createPost.ts', 'createPost')).toBe('posts.createPost')
     expect(actionId('ping.ts', 'ping')).toBe('ping')

@@ -105,6 +105,7 @@ function nativePlugin(options: NativeViteOptions = {}): Plugin {
       const gen = generatedDir(root)
       const libraryRoot = path.dirname(fileURLToPath(import.meta.url))
       const nodeEntry = resolveEntry(libraryRoot, 'node-entry')
+      const bunEntry = resolveEntry(libraryRoot, 'bun-entry')
       const workerEntry = resolveEntry(libraryRoot, 'worker-entry')
 
       return {
@@ -139,6 +140,7 @@ function nativePlugin(options: NativeViteOptions = {}): Plugin {
                 input: {
                   app: path.resolve(gen, 'server.ts'),
                   node: nodeEntry,
+                  bun: bunEntry,
                   worker: workerEntry,
                 } as Record<string, string>,
                 output: {
