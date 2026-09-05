@@ -15,4 +15,4 @@ Or `pubflow create native my-app`.
 
 Do not run `npx shadcn@latest init -t vite` or `-t start` on a Native app. See [docs/shadcn.md](../../docs/shadcn.md).
 
-Minimal / Custom Hono: `pubflow add shadcn`, then `npx shadcn@latest add …`.
+Minimal / Custom Hono already include Tailwind. Add shadcn with `pubflow add shadcn`, then `npx shadcn@latest add …`.

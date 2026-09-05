@@ -50,7 +50,7 @@ Default is an **existing** project. Skip Vite-from-scratch docs. Only `add` / `a
 
 ## Minimal / Custom Hono
 
-Those apps have no Tailwind. Scaffold once, then use the official CLI:
+Those apps already include Tailwind v4 (`@tailwindcss/vite`). They do **not** include shadcn. Scaffold shadcn once, then use the official CLI:
 
 ```bash
 pubflow add shadcn
@@ -58,4 +58,4 @@ bun install
 npx shadcn@latest add button
 ```
 
-`pubflow add shadcn` does not wrap `shadcn add`. If `components.json` already exists (Default), it tells you to run `npx shadcn@latest add <name>`.
+`pubflow add shadcn` does not wrap `shadcn add`. If `components.json` already exists (Default), it tells you to run `npx shadcn@latest add <name>`. If Tailwind is already in `vite.config.ts`, the command does not add it twice.

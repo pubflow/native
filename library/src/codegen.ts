@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { listExportedFunctions } from './actions.ts'
+import { preferFolderMounts } from './api-path.ts'
 import {
   actionId,
   customServerPath,
@@ -28,6 +29,40 @@ type DirNode = {
 function ident(prefix: string, parts: string[]): string {
   const raw = [prefix, ...parts].join('_').replace(/[^a-zA-Z0-9_]/g, '_')
   return raw.replace(/_+/g, '_') || prefix
+}
+
+function folderUrlSegment(segment: string): string {
+  const param = segment.match(/^\[(.+)\]$/)
+  return param ? `$${param[1]}` : segment
+}
+
+function pagePathSegments(file: PageFile): string[] {
+  const dir = file.dir.map(folderUrlSegment)
+  const last = file.kind === 'index' ? '' : file.param ? `$${file.param}` : file.name || ''
+  return [...dir, last].filter(Boolean)
+}
+
+function dropConflictingPages(files: PageFile[]): { files: PageFile[]; warnings: string[] } {
+  const folders = new Set<string>()
+  for (const file of files) {
+    if (file.dir.length) folders.add(file.dir.join('/'))
+  }
+  const warnings: string[] = []
+  const kept: PageFile[] = []
+  for (const file of files) {
+    if (file.kind === 'page') {
+      const leaf = file.param ? `[${file.param}]` : file.name
+      if (leaf) {
+        const folderKey = [...file.dir, leaf].join('/')
+        if (folders.has(folderKey)) {
+          warnings.push(`app/pages/${file.rel} ignored; app/pages/${folderKey}/ already defines that path`)
+          continue
+        }
+      }
+    }
+    kept.push(file)
+  }
+  return { files: kept, warnings }
 }
 
 function ensureNode(root: DirNode, dir: string[]): DirNode {
@@ -62,7 +97,7 @@ function buildTree(files: PageFile[]): DirNode {
 function emitRouter(root: string, files: PageFile[], htmlTemplate = ''): string {
   const tree = buildTree(files)
   const imports: string[] = [
-    `import { createRootRoute, createRoute, createRouter, Outlet } from '@tanstack/react-router'`,
+    `import { createRootRoute, createRoute, createRouter, Outlet, useParams } from '@tanstack/react-router'`,
     `import type { AnyHistory, AnyRoute } from '@tanstack/react-router'`,
     `import type { ComponentType, ReactNode } from 'react'`,
   ]
@@ -78,9 +113,17 @@ function emitRouter(root: string, files: PageFile[], htmlTemplate = ''): string 
   }
 
   const body: string[] = [
-    `function asLayout(Layout: ComponentType<{ children: ReactNode }>) {`,
+    `function asLayout(Layout: ComponentType<{ children: ReactNode } & Record<string, string>>) {`,
     `  return function LayoutRoute() {`,
-    `    return <Layout><Outlet /></Layout>`,
+    `    const params = useParams({ strict: false }) as Record<string, string>`,
+    `    return <Layout {...params}><Outlet /></Layout>`,
+    `  }`,
+    `}`,
+    ``,
+    `function withParams(Page: ComponentType<Record<string, string>>) {`,
+    `  return function PageWithParams() {`,
+    `    const params = useParams({ strict: false }) as Record<string, string>`,
+    `    return <Page {...params} />`,
     `  }`,
     `}`,
     ``,
@@ -107,10 +150,10 @@ function emitRouter(root: string, files: PageFile[], htmlTemplate = ''): string 
     const nestedChildren: string[] = []
 
     if (!isRoot) {
-      const path = urlSegment
+      const routePath = folderUrlSegment(urlSegment)
       const opts: string[] = [
         `  getParentRoute: () => ${parentVar},`,
-        `  path: ${JSON.stringify(path)},`,
+        `  path: ${JSON.stringify(routePath)},`,
       ]
       if (node.layout) {
         opts.push(`  component: asLayout(${addImport(node.layout, 'Layout')}),`)
@@ -128,7 +171,7 @@ function emitRouter(root: string, files: PageFile[], htmlTemplate = ''): string 
         `const ${indexVar} = createRoute({`,
         `  getParentRoute: () => ${routeVar},`,
         `  path: '/',`,
-        `  component: ${addImport(node.index, 'Index')},`,
+        `  component: withParams(${addImport(node.index, 'Index')}),`,
         `})`,
         ``,
       )
@@ -142,7 +185,7 @@ function emitRouter(root: string, files: PageFile[], htmlTemplate = ''): string 
         `const ${pageVar} = createRoute({`,
         `  getParentRoute: () => ${routeVar},`,
         `  path: ${JSON.stringify(segment)},`,
-        `  component: ${addImport(page, 'Page')},`,
+        `  component: withParams(${addImport(page, 'Page')}),`,
         `})`,
         ``,
       )
@@ -263,24 +306,24 @@ function collectActionIds(root: string): string[] {
   return [...new Set(ids)]
 }
 
-function emitTypes(root: string): string {
-  const pages = scanPages(root)
-  const apis = scanApi(root).filter((file) => !file.isMiddleware)
+function emitTypes(root: string, pageFiles: PageFile[]): string {
+  const pages = dropConflictingPages(pageFiles).files
+  const apis = preferFolderMounts(
+    scanApi(root)
+      .filter((file) => !file.isMiddleware)
+      .map((file) => ({ ...file, rank: file.rank || 0 })),
+    () => {},
+  )
   const actionIds = collectActionIds(root)
   const routes = pages
     .filter((file) => file.kind === 'index' || file.kind === 'page')
-    .map((file) => {
-      const segs = [
-        ...file.dir,
-        file.kind === 'index' ? '' : file.param ? `$${file.param}` : file.name || '',
-      ].filter(Boolean)
-      return '/' + segs.join('/')
-    })
+    .map((file) => '/' + pagePathSegments(file).join('/'))
   const unique = [...new Set(routes.length ? routes : ['/'])]
+  const apiMounts = [...new Set(apis.map((a) => '/api' + (a.mount === '/' ? '' : a.mount)))]
   return `/* Generated by @pubflow/native — do not edit */
 export type NativePagePath = ${unique.map((r) => JSON.stringify(r)).join(' | ')}
 export type NativeApiMount = ${
-    apis.length ? apis.map((a) => JSON.stringify('/api' + a.mount)).join(' | ') : 'never'
+    apiMounts.length ? apiMounts.map((a) => JSON.stringify(a)).join(' | ') : 'never'
   }
 export type NativeActionId = ${
     actionIds.length ? actionIds.map((id) => JSON.stringify(id)).join(' | ') : 'never'
@@ -298,17 +341,31 @@ export type CodegenResult = {
   dir: string
   files: string[]
   customServer: boolean
+  warnings: string[]
 }
 
 export function generateNative(root: string, htmlTemplate = ''): CodegenResult {
   const dir = generatedDir(root)
   fs.mkdirSync(dir, { recursive: true })
-  const pages = scanPages(root)
+  const scanned = scanPages(root)
+  const { files: pages, warnings } = dropConflictingPages(scanned)
+  const apiWarnings: string[] = []
+  preferFolderMounts(
+    scanApi(root)
+      .filter((file) => !file.isMiddleware)
+      .map((file) => ({ ...file, rank: file.rank || 0 })),
+    (dropped, kept) => {
+      apiWarnings.push(
+        `app/api/${dropped.rel} ignored; app/api/${kept.rel} already defines /api${kept.mount === '/' ? '' : kept.mount}`,
+      )
+    },
+  )
+  const allWarnings = [...warnings, ...apiWarnings]
   const files = {
     'router.tsx': emitRouter(root, pages, htmlTemplate),
     'client.tsx': emitClient(),
     'server.ts': emitServer(root, htmlTemplate),
-    'types.d.ts': emitTypes(root),
+    'types.d.ts': emitTypes(root, pages),
     '.gitignore': emitGitignore(),
   }
   for (const [name, source] of Object.entries(files)) {
@@ -318,5 +375,6 @@ export function generateNative(root: string, htmlTemplate = ''): CodegenResult {
     dir,
     files: Object.keys(files).map((name) => toPosix(path.join(dir, name))),
     customServer: hasCustomServer(root),
+    warnings: allWarnings,
   }
 }

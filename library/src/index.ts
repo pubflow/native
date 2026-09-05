@@ -15,3 +15,5 @@ export { generateNative } from './codegen.ts'
 export { publicEnv } from './env.ts'
 
 export { default as native } from './vite.ts'
+
+export { usePathParams } from './params.ts'

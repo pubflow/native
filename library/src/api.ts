@@ -1,26 +1,9 @@
 import { Hono } from 'hono'
 import type { MiddlewareHandler } from 'hono'
+import { apiRelFromGlobKey, parseApiRel, preferFolderMounts } from './api-path.ts'
 
 type ApiModule = {
   default?: unknown
-}
-
-function normalizeKey(key: string): string {
-  return key.replace(/\\/g, '/')
-}
-
-function mountFromGlobKey(key: string): { mount: string; isMiddleware: boolean } {
-  const posix = normalizeKey(key)
-  const marker = '/app/api/'
-  const idx = posix.lastIndexOf(marker)
-  const rel = (idx >= 0 ? posix.slice(idx + marker.length) : posix.split('/app/api/').pop() || posix)
-    .replace(/\.(ts|js)$/, '')
-  const parts = rel.split('/').filter(Boolean)
-  const last = parts[parts.length - 1]
-  if (last === '_middleware') {
-    return { mount: '/' + parts.slice(0, -1).join('/'), isMiddleware: true }
-  }
-  return { mount: '/' + parts.join('/'), isMiddleware: false }
 }
 
 function isHonoApp(value: unknown): value is Hono {
@@ -33,25 +16,34 @@ function isMiddleware(value: unknown): value is MiddlewareHandler {
 
 /**
  * Build a Hono app from Vite `import.meta.glob` of `app/api/**`.
- * `_middleware.ts` wraps every `/api/*` route. Each other default export is mounted
- * at `/api/<relative-path>` (without the `/api` prefix on this sub-app).
+ * `_middleware.ts` wraps `/api/*` (or a folder prefix). Each other default export is mounted
+ * at `/api/<relative-path>` (`index.ts` collapses to the folder). Files/folders starting with
+ * `_` (except `_middleware`) are skipped. If a leaf file and a folder `index` share a mount,
+ * the folder wins.
  */
 export function createApiApp(modules: Record<string, ApiModule>): Hono {
   const api = new Hono()
   const middleware: Array<{ mount: string; handler: MiddlewareHandler }> = []
-  const routes: Array<{ mount: string; app: Hono }> = []
+  const routes: Array<{ mount: string; app: Hono; rank: number; key: string }> = []
 
   for (const [key, mod] of Object.entries(modules)) {
-    const { mount, isMiddleware: mw } = mountFromGlobKey(key)
+    const parsed = parseApiRel(apiRelFromGlobKey(key))
+    if (parsed.skip) continue
     const exported = mod?.default
-    if (mw) {
-      if (isMiddleware(exported)) middleware.push({ mount, handler: exported })
+    if (parsed.isMiddleware) {
+      if (isMiddleware(exported)) middleware.push({ mount: parsed.mount, handler: exported })
       continue
     }
     if (isHonoApp(exported)) {
-      routes.push({ mount, app: exported })
+      routes.push({ mount: parsed.mount, app: exported, rank: parsed.rank, key })
     }
   }
+
+  const kept = preferFolderMounts(routes, (dropped, keptRoute) => {
+    console.warn(
+      `[pubflow-native] ${dropped.key} ignored; folder already defines /api${keptRoute.mount === '/' ? '' : keptRoute.mount}`,
+    )
+  })
 
   const rootMw = middleware.filter((item) => item.mount === '/' || item.mount === '')
   for (const item of rootMw) api.use('*', item.handler)
@@ -60,7 +52,7 @@ export function createApiApp(modules: Record<string, ApiModule>): Hono {
       api.use(`${item.mount}/*`, item.handler)
     }
   }
-  for (const route of routes) {
+  for (const route of kept) {
     api.route(route.mount === '/' ? '/' : route.mount, route.app)
   }
   return api

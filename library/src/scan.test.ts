@@ -31,6 +31,19 @@ describe('scanPages', () => {
     expect(idPage?.rel).toBe('users/[id].tsx')
     fs.rmSync(root, { recursive: true, force: true })
   })
+
+  it('scans nested products/index and siblings', () => {
+    const root = tmpProject()
+    fs.mkdirSync(path.join(root, 'app', 'pages', 'products'), { recursive: true })
+    fs.writeFileSync(path.join(root, 'app', 'pages', 'products', 'index.tsx'), 'export default function P() { return null }')
+    fs.writeFileSync(path.join(root, 'app', 'pages', 'products', 'edit.tsx'), 'export default function E() { return null }')
+    fs.writeFileSync(path.join(root, 'app', 'pages', 'products', 'layout.tsx'), 'export default function L({ children }) { return children }')
+    const pages = scanPages(root)
+    expect(pages.find((file) => file.rel === 'products/index.tsx')?.kind).toBe('index')
+    expect(pages.find((file) => file.rel === 'products/edit.tsx')?.name).toBe('edit')
+    expect(pages.find((file) => file.rel === 'products/layout.tsx')?.kind).toBe('layout')
+    fs.rmSync(root, { recursive: true, force: true })
+  })
 })
 
 describe('scanApi', () => {
@@ -42,6 +55,30 @@ describe('scanApi', () => {
     const mw = apis.find((file) => file.rel === '_middleware.ts')
     expect(mw?.isMiddleware).toBe(true)
     expect(mw?.mount).toBe('/')
+    fs.rmSync(root, { recursive: true, force: true })
+  })
+
+  it('collapses products/index.ts to /products', () => {
+    const root = tmpProject()
+    fs.mkdirSync(path.join(root, 'app', 'api', 'products'), { recursive: true })
+    fs.writeFileSync(path.join(root, 'app', 'api', 'products', 'index.ts'), 'export default {}')
+    fs.writeFileSync(path.join(root, 'app', 'api', 'products', '_middleware.ts'), 'export default async function mw() {}')
+    const apis = scanApi(root)
+    expect(apis.find((file) => file.rel === 'products/index.ts')?.mount).toBe('/products')
+    const mw = apis.find((file) => file.rel === 'products/_middleware.ts')
+    expect(mw?.isMiddleware).toBe(true)
+    expect(mw?.mount).toBe('/products')
+    fs.rmSync(root, { recursive: true, force: true })
+  })
+
+  it('skips underscore helpers except _middleware', () => {
+    const root = tmpProject()
+    fs.mkdirSync(path.join(root, 'app', 'api', 'v1', '_lib'), { recursive: true })
+    fs.writeFileSync(path.join(root, 'app', 'api', 'v1', '_hidden.ts'), 'export default {}')
+    fs.writeFileSync(path.join(root, 'app', 'api', 'v1', '_lib', 'db.ts'), 'export default {}')
+    const apis = scanApi(root)
+    expect(apis.find((file) => file.rel.includes('_hidden'))).toBeUndefined()
+    expect(apis.find((file) => file.rel.includes('_lib'))).toBeUndefined()
     fs.rmSync(root, { recursive: true, force: true })
   })
 })

@@ -88,7 +88,13 @@ function nativePlugin(options: NativeViteOptions = {}): Plugin {
   let isSsrBuild = false
   let command: 'build' | 'serve' = 'serve'
 
-  const regenerate = (html = '') => generateNative(root, html)
+  const regenerate = (html = '') => {
+    const result = generateNative(root, html)
+    for (const warning of result.warnings) {
+      console.warn(`[pubflow-native] ${warning}`)
+    }
+    return result
+  }
 
   return {
     name: 'pubflow-native',

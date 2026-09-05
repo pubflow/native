@@ -23,8 +23,8 @@ pubflow create native-custom-hono my-app
 | CLI id | Folder | What you get |
 | --- | --- | --- |
 | `native` | `starter/` | Auth, Tailwind, Docker, Cloudflare |
-| `native-minimal` | `examples/minimal` | No auth, no Tailwind |
-| `native-custom-hono` | `examples/custom-hono-server` | You own `app/server.ts` |
+| `native-minimal` | `examples/minimal` | No auth. Tailwind. `/items` demo. |
+| `native-custom-hono` | `examples/custom-hono-server` | You own `app/server.ts`. Tailwind. `/items` demo. |
 
 `cloudflare-worker`, `with-auth`, and `shadcn` under `examples/` are notes, not templates. Cloudflare, auth, and shadcn are on Default.
 

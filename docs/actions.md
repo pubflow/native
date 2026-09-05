@@ -9,6 +9,8 @@ app/actions/posts/_middleware.ts → folder middleware
 app/actions/_auth.ts             → optional requireAuth adapter
 ```
 
+`app/actions/posts/index.ts` exporting `createPost` becomes `posts.index.createPost` — the `index` segment is kept. Prefer a file named after the function.
+
 ```ts
 import type { ActionContext } from '@pubflow/native/actions'
 

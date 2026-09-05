@@ -1,8 +1,10 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { toPosix } from './access.ts'
+import { parseApiRel } from './api-path.ts'
 
 export { actionId, toPosix } from './access.ts'
+export { parseApiRel } from './api-path.ts'
 
 export type PageKind = 'layout' | 'index' | 'page' | 'error' | 'pending'
 
@@ -24,6 +26,8 @@ export type ApiFile = {
   /** Mount path under `/api`, e.g. `/users` or `/webhooks/stripe`. */
   mount: string
   isMiddleware: boolean
+  skip?: boolean
+  rank?: number
 }
 
 export type ActionFile = {
@@ -82,14 +86,8 @@ export function scanPages(root: string): PageFile[] {
     .sort((a, b) => a.rel.localeCompare(b.rel))
 }
 
-function fileToApiMount(rel: string): { mount: string; isMiddleware: boolean } {
-  const posix = toPosix(rel).replace(API_EXT, '')
-  const parts = posix.split('/').filter(Boolean)
-  const last = parts[parts.length - 1]
-  if (last === '_middleware') {
-    return { mount: '/' + parts.slice(0, -1).join('/'), isMiddleware: true }
-  }
-  return { mount: '/' + parts.join('/'), isMiddleware: false }
+function fileToApiMount(rel: string): { mount: string; isMiddleware: boolean; skip: boolean; rank: number } {
+  return parseApiRel(rel)
 }
 
 export function scanActions(root: string): ActionFile[] {
@@ -114,9 +112,10 @@ export function scanApi(root: string): ApiFile[] {
     .filter((abs) => API_EXT.test(abs) && !abs.endsWith('.d.ts'))
     .map((abs) => {
       const rel = toPosix(path.relative(apiRoot, abs))
-      const { mount, isMiddleware } = fileToApiMount(rel)
-      return { abs, rel, mount, isMiddleware }
+      const { mount, isMiddleware, skip, rank } = fileToApiMount(rel)
+      return { abs, rel, mount, isMiddleware, skip, rank }
     })
+    .filter((file) => !file.skip)
     .sort((a, b) => a.rel.localeCompare(b.rel))
 }
 
