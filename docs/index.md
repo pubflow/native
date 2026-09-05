@@ -6,6 +6,7 @@ Pubflow Native is a **full-stack TypeScript framework**: React pages and Hono AP
 - [Create](./create.md)
 - [Pages](./pages.md)
 - [API](./api.md)
+- [Actions](./actions.md)
 - [Auth](./auth.md)
 - [Data and env](./data-env.md)
 - [Config](./config.md)

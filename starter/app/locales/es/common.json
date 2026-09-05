@@ -45,8 +45,8 @@
     "welcome": "Hola",
     "signedIn": "Sesión activa",
     "apiBase": "URL Flowless",
-    "userData": "Sesión + /api/users",
-    "modules": "El navegador llama a /api/* del mismo origen con X-Session-ID. requireAuth() valida contra Flowless.",
+    "userData": "Sesión + /api/users + Actions",
+    "modules": "El navegador llama POST /api/actions/* del mismo origen con X-Session-ID. requireAuth() valida contra Flowless.",
     "cards": {
       "auth": "Autenticación",
       "authText": "El estado de sesión lo maneja @pubflow/react.",
@@ -65,6 +65,7 @@
   "status": {
     "protected": "Protegido",
     "loading": "Cargando",
-    "redirecting": "Redirigiendo al login"
+    "redirecting": "Redirigiendo al login",
+    "forbidden": "No tienes acceso a esta página"
   }
 }

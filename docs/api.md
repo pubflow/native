@@ -5,12 +5,15 @@ Each `app/api/**/*.ts` file is a real Hono app. The glob mounts `export default`
 ```ts
 // app/api/users.ts → /api/users
 import { Hono } from 'hono'
-import { requireAuth } from '@/lib/auth'
+import { requireAuth, requireRole } from '@/lib/auth'
 
 const users = new Hono()
 users.get('/', requireAuth(), (c) => c.json({ user: c.get('session') }))
+users.get('/admin', requireRole('admin', 'editor'), (c) => c.json({ user: c.get('session') }))
 export default users
 ```
+
+`requireAuth` / `requireRole` come from `@pubflow/native/auth` (the starter re-exports them in `app/lib/auth.ts`). See [Auth](./auth.md).
 
 ## Control layers
 
@@ -33,3 +36,7 @@ export default app
 ```
 
 `/health` and `/openapi.json` are registered on the generated server. Custom servers can add their own.
+
+## Actions
+
+UI mutations that should not live in a page go in `app/actions`. They are still Hono: `POST /api/actions/<id>` with JSON. See [Actions](./actions.md). Do not add a second protocol (gRPC, RSC Flight) for the browser.

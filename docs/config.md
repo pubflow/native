@@ -7,7 +7,7 @@ import { defineConfig, type NativeConfig } from '@pubflow/native/config'
 
 export default defineConfig({
   auth: { provider: 'flowless' },
-  runtime: 'bun', // 'node' | 'cloudflare' | 'deno'
+  runtime: 'bun', // 'node' | 'cloudflare'
 } satisfies NativeConfig)
 ```
 
@@ -23,4 +23,4 @@ export default defineConfig({
 
 CLI metadata may also live in `.pubflow/pubflow.json`. Generated router types go to `.pubflow/generated/`.
 
-`runtime` in this file is **intent**, not a bundler switch in v0.1. `native()` always emits the Node entry (`dist/server/node.js`) and the Worker entry (`dist/server/worker.js`). Pick the one your host uses. Deno is listed on the type but has no dedicated entry yet.
+`runtime` in this file is **intent**, not a bundler switch. `native()` always emits `dist/server/node.js`, `dist/server/bun.js`, and `dist/server/worker.js`. Pick the one your host uses.

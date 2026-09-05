@@ -37,11 +37,14 @@ BRIDGE_VALIDATION_SECRET=
 DATABASE_URL=
 ```
 
-`DATABASE_URL` is not available in `app/pages`. Put queries in `app/api` or `app/server.ts`.
+`DATABASE_URL` is not available in `app/pages`. Put queries in `app/api`, `app/actions`, or `app/server.ts`.
 
 ## Scripts
 
 - `bun run dev` — Vite + Hono
 - `bun run build` — client + SSR
-- `bun run start` — Node
+- `bun run start` — Node (`dist/server/node.js`)
+- `bun run start:bun` — Bun (`dist/server/bun.js`)
 - `bun run dev:cf` / `deploy:cf` — Cloudflare Worker
+
+Nixpacks: `starter/nixpacks.toml` (Coolify / Railway). Docker: `starter/Dockerfile`.

@@ -4,19 +4,20 @@
 
 Anyone can use it. It is **not** locked to Pubflow products, accounts, or auth. A blog, a SaaS, an internal tool, or a Pubflow app all look the same: `app/pages` for UI, `app/api` for server code.
 
-Hono owns `fetch`. TanStack Router is a library for file routes and SSR — not TanStack Start, not Next.js, not HonoX.
+Hono owns `fetch`. TanStack Router is a library for file routes and SSR — not TanStack Start, not Next.js, not HonoX. The browser talks HTTP JSON to that same process. gRPC (or Hono RPC / `hc`) can sit behind Native if another service needs it; it is not a faster path for the UI.
 
 Package: [`@pubflow/native`](https://www.npmjs.com/package/@pubflow/native)
 
 ```
 app/pages/     UI (layout.tsx, index.tsx, [id].tsx)
 app/api/       Hono apps → /api/...
+app/actions/   functions → POST /api/actions/<id>
 app/server.ts  optional — you own fetch
 index.html
 vite.config.ts plugins: [native()]
 ```
 
-Pages cannot read `DATABASE_URL`. Put queries and secrets in `app/api`. The browser only sees `PUBFLOW_PUBLIC_*` / `VITE_*`.
+Pages cannot read `DATABASE_URL`. Put queries and secrets in `app/api` or `app/actions`. The browser only sees `PUBFLOW_PUBLIC_*` / `VITE_*`.
 
 ## New app: clone [starter/](https://github.com/pubflow/native/tree/master/starter)
 
@@ -47,7 +48,7 @@ When `pubflow create native` is on npm it will copy this same `starter/` folder.
 `bun add` the library. You do not need the rest of Pubflow.
 
 ```bash
-bun add @pubflow/native@0.1.1 @tanstack/react-router hono react react-dom
+bun add @pubflow/native@0.1.4 @tanstack/react-router hono react react-dom
 bun add -d vite
 ```
 
@@ -89,6 +90,13 @@ hello.get('/', (c) => c.json({ hello: true }))
 export default hello
 ```
 
+```ts
+// app/actions/ping.ts → POST /api/actions/ping
+export async function ping() {
+  return { ok: true }
+}
+```
+
 `GET /health` is registered for you. `bunx vite`, then hit `/` and `/api/hello`.
 
 Already on Hono? Keep your routes and mount pages for the rest:
@@ -108,8 +116,8 @@ See [`examples/custom-hono-server`](examples/custom-hono-server) and [`examples/
 ## What it is for
 
 - One TypeScript codebase instead of a separate frontend repo and API repo
-- Same-origin `/api` so secrets stay on the server
-- Hono `fetch` on Bun, Node, and Cloudflare Workers — no RSC, no Nitro
+- Same-origin `/api` and `POST /api/actions` so secrets stay on the server
+- Hono `fetch` on Bun, Node, and Cloudflare Workers — no RSC, no Nitro, no gRPC for the UI
 - File routes you already know: `layout.tsx`, `index.tsx`, `[id].tsx`
 
 Use something else for mobile (`pubflow create react-native` / Expo), a non-TS API (Go, Python, …), or an MPA/islands setup (HonoX).
@@ -124,6 +132,7 @@ Use something else for mobile (`pubflow create react-native` / Expo), a non-TS A
 | `app/pages/[id].tsx` | `/$id` |
 | `app/api/users.ts` | `/api/users` |
 | `app/api/_middleware.ts` | Middleware for `/api/*` |
+| `app/actions/posts/createPost.ts` | `POST /api/actions/posts.createPost` |
 
 Default export is the page, layout, or Hono app. You do not write `createFileRoute`. Generated files live in `.pubflow/generated/` (gitignored).
 

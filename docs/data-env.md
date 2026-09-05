@@ -2,7 +2,7 @@
 
 Two data modes:
 
-1. **Same process (default)** — page loaders and the browser call `/api/*` on this app.
+1. **Same process (default)** — page loaders and the browser call `/api/*` and `POST /api/actions/*` on this app.
 2. **Remote Flowfull** — `pubflow.config.ts` / env can point `FLOWFULL_API_URL` at Go/Python/another Node API. Local `/api` can stay a BFF.
 
 Rules:
