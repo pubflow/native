@@ -3,4 +3,7 @@ import native from '@pubflow/native/vite'
 
 export default defineConfig({
   plugins: [native()],
+  server: {
+    port: 3000,
+  },
 })

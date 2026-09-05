@@ -36,4 +36,13 @@ export const { requireAuth, requireRole } = createAuth(async (sessionId) => {
 
 Pages: `AuthGuard` `allowedTypes` is UI only — **POST still needs server checks**.
 
-Env: browser `PUBFLOW_PUBLIC_FLOWLESS_URL` / `PUBFLOW_PUBLIC_BRIDGE_SECRET`. Server `FLOWLESS_URL` + `BRIDGE_VALIDATION_SECRET`. Header `X-Bridge-Secret` on `POST /auth/bridge/validate`.
+**Flowless core** is the source of truth (login, sessions, `POST /auth/bridge/validate`). Native `requireAuth()` does not decide if a session is valid — it sends `session_id` and the Bridge header, then uses what Flowless returns. `@pubflow/react` talks to Flowless the same way as create-flowfull-client: URL and Bridge are **public client config**.
+
+```
+PUBFLOW_PUBLIC_FLOWLESS_URL=http://localhost:8787
+PUBFLOW_PUBLIC_BRIDGE_SECRET=
+FLOWLESS_URL=http://localhost:8787
+BRIDGE_SECRET=
+```
+
+`PUBFLOW_PUBLIC_*` / `VITE_*` go in the browser (`PubflowProvider` `baseUrl` + `X-Bridge-Secret`). The unprefixed names are the same strings for `requireAuth()`. `BRIDGE_VALIDATION_SECRET` is an alias of `BRIDGE_SECRET`. Header `X-Bridge-Secret` on `POST /auth/bridge/validate`. `DATABASE_URL` is the only app secret.

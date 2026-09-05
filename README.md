@@ -39,9 +39,28 @@ bun run start        # node dist/server/node.js
 bun run deploy:cf    # Cloudflare Worker
 ```
 
-The starter ships login/dashboard/Tailwind as a complete example. **Delete or ignore auth** if you do not use Flowless — Native does not require it. `GET /` and your own `/api/*` routes work with no Pubflow services running.
+The starter (Default) is a complete example: login/dashboard, Tailwind v4, and **shadcn already wired** (`components.json`, `cn()`, `@/` → `app/`, a few UI files). Add more with the official CLI — `npx shadcn@latest add dialog` — not `init -t vite`. **Delete or ignore auth** if you do not use Flowless — Native does not require it. `GET /` and your own `/api/*` routes work with no Pubflow services running.
 
-When `pubflow create native` is on npm it will copy this same `starter/` folder.
+`pubflow create native` / `pubflow start native` copies `starter/`. `native-minimal` and `native-custom-hono` copy those example apps (also cloneable with degit). Cloudflare, auth, and shadcn are on Default — `examples/cloudflare-worker`, `examples/with-auth`, and `examples/shadcn` are notes, not templates. Minimal/Custom Hono have no Tailwind; run `pubflow add shadcn` then `npx shadcn add`.
+
+Install the CLI ([`pubflow`](https://www.npmjs.com/package/pubflow) on npm — bins `pubflow` and `pbfl`). Pick the manager you already use:
+
+```bash
+npm install -g pubflow
+pnpm add -g pubflow
+yarn global add pubflow
+bun add -g pubflow
+```
+
+Without a global install:
+
+```bash
+npx pubflow start native my-app
+npx pubflow create native my-app
+pnpm dlx pubflow start native my-app
+yarn dlx pubflow create native my-app
+bunx pubflow start native my-app
+```
 
 ## Existing project
 
@@ -111,7 +130,7 @@ app.all('*', pages())
 export default app
 ```
 
-See [`examples/custom-hono-server`](examples/custom-hono-server) and [`examples/minimal`](examples/minimal).
+See [`examples/`](examples/) — Minimal and Custom Hono are cloneable apps; Cloudflare, with-auth, and shadcn point at Default.
 
 ## What it is for
 
@@ -147,8 +166,9 @@ The starter can talk to [Flowless](https://github.com/pubflow) for login (`@pubf
 | Path | What it is |
 | --- | --- |
 | [`library/`](library/) | npm `@pubflow/native` |
-| [`starter/`](https://github.com/pubflow/native/tree/master/starter) | the app — `npx degit pubflow/native/starter` |
-| `examples/`, `docs/` | extra samples — not required |
+| [`starter/`](https://github.com/pubflow/native/tree/master/starter) | Default app — auth, Tailwind, shadcn, Cloudflare. `npx degit pubflow/native/starter` / `pubflow create native` |
+| [`examples/minimal`](examples/minimal), [`examples/custom-hono-server`](examples/custom-hono-server) | other cloneable Native apps |
+| `examples/cloudflare-worker`, `examples/with-auth`, `examples/shadcn`, `docs/` | notes / docs — not templates |
 
 Root `package.json` is private. After a library fix: publish npm, **then** bump the pin in `starter/package.json`.
 

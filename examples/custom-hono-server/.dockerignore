@@ -1,0 +1,10 @@
+node_modules
+.git
+.pubflow
+dist
+.env
+.env.*
+!.env.example
+*.md
+.wrangler
+.DS_Store

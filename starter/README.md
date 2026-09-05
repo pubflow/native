@@ -9,9 +9,11 @@ bun install
 bun run dev
 ```
 
-Browse the files: [github.com/pubflow/native/tree/master/starter](https://github.com/pubflow/native/tree/master/starter).
+Browse the files: [github.com/pubflow/native/tree/master/starter](https://github.com/pubflow/native/tree/master/starter). Same folder as `pubflow create native`.
 
 Pubflow / Flowless auth in this template is **optional**. Delete `app/pages/login`, dashboard guards, and `@pubflow/react` if you just want the framework.
+
+shadcn is already set up (`components.json`, Tailwind v4). Add components with `npx shadcn@latest add dialog`. Do not run `init -t vite`.
 
 `app/actions` is POST JSON to Hono (`/api/actions/...`), not RSC. Hooks like `AuthGuard` do not protect POST — set `export const auth = true` (or `allowedTypes`) and keep `app/actions/_auth.ts`. Server helpers: `requireAuth()` / `requireRole('admin', 'editor')` from `@pubflow/native/auth`.
 

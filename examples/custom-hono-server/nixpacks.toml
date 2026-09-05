@@ -1,0 +1,17 @@
+# Coolify / Railway / any Nixpacks host.
+# Use [start] (not [phases.start]) — Coolify rejects the latter.
+# Force Bun: default `npm start` would run `node dist/server/node.js` without Node in a Bun image.
+
+providers = ["bun"]
+
+[variables]
+NODE_ENV = "production"
+
+[phases.install]
+cmds = ["bun install"]
+
+[phases.build]
+cmds = ["bun run build"]
+
+[start]
+cmd = "bun dist/server/bun.js"

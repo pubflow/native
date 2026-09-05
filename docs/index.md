@@ -11,8 +11,9 @@ Pubflow Native is a **full-stack TypeScript framework**: React pages and Hono AP
 - [Data and env](./data-env.md)
 - [Config](./config.md)
 - [CLI](./cli.md)
+- [shadcn/ui](./shadcn.md)
 - [Deploy](./deploy.md)
 - [Adoption](./adoption.md)
 - [Migrate from Next / TanStack Start](./migrate.md)
 
-Package: `@pubflow/native`. CLI: `pubflow create native`.
+Package: `@pubflow/native`. CLI: `pubflow create native` or `pubflow start native` (also `native-minimal`, `native-custom-hono`).
