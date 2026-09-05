@@ -11,17 +11,26 @@ const resources = {
 }
 
 if (!i18n.isInitialized) {
-  i18n.use(LanguageDetector).use(initReactI18next).init({
-    resources,
-    fallbackLng: 'en',
-    lng: PUBFLOW_CONFIG.DEFAULT_LANGUAGE,
-    defaultNS: 'common',
-    interpolation: { escapeValue: false },
-    detection: {
-      order: ['localStorage', 'navigator'],
-      caches: ['localStorage'],
-    },
-  })
+  if (PUBFLOW_CONFIG.LANGUAGE_LOCKED) {
+    i18n.use(initReactI18next).init({
+      resources,
+      fallbackLng: PUBFLOW_CONFIG.DEFAULT_LANGUAGE,
+      lng: PUBFLOW_CONFIG.DEFAULT_LANGUAGE,
+      defaultNS: 'common',
+      interpolation: { escapeValue: false },
+    })
+  } else {
+    i18n.use(LanguageDetector).use(initReactI18next).init({
+      resources,
+      fallbackLng: 'en',
+      defaultNS: 'common',
+      interpolation: { escapeValue: false },
+      detection: {
+        order: ['localStorage', 'navigator'],
+        caches: ['localStorage'],
+      },
+    })
+  }
 }
 
 export { i18n }

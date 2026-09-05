@@ -1,6 +1,6 @@
 {
   "name": "@pubflow/native",
-  "version": "0.1.5",
+  "version": "1.0.0",
   "description": "Full Stack App Framework: React pages and Hono APIs in one process. Universal — not locked to Pubflow apps.",
   "type": "module",
   "license": "MIT",
@@ -68,14 +68,55 @@
       "types": "./src/auth.ts",
       "import": "./dist/auth.js",
       "default": "./dist/auth.js"
+    },
+    "./http": {
+      "types": "./src/http.ts",
+      "import": "./dist/http.js",
+      "default": "./dist/http.js"
+    },
+    "./db": {
+      "types": "./src/db.ts",
+      "import": "./dist/db.js",
+      "default": "./dist/db.js"
+    },
+    "./cache": {
+      "types": "./src/cache.ts",
+      "import": "./dist/cache.js",
+      "default": "./dist/cache.js"
+    },
+    "./mail": {
+      "types": "./src/mail.ts",
+      "import": "./dist/mail.js",
+      "default": "./dist/mail.js"
+    },
+    "./rate-limit": {
+      "types": "./src/rate-limit.ts",
+      "import": "./dist/rate-limit.js",
+      "default": "./dist/rate-limit.js"
     }
   },
   "peerDependencies": {
+    "@libsql/client": "^0.14.0",
+    "@libsql/kysely-libsql": "^0.4.0",
     "@tanstack/react-router": "^1.120.0",
     "hono": "^4.0.0",
+    "ioredis": "^5.0.0",
+    "kysely": "^0.27.0 || ^0.28.0",
+    "mysql2": "^3.0.0",
+    "nodemailer": "^6.0.0 || ^7.0.0",
+    "pg": "^8.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "vite": ">=6.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@libsql/client": { "optional": true },
+    "@libsql/kysely-libsql": { "optional": true },
+    "ioredis": { "optional": true },
+    "kysely": { "optional": true },
+    "mysql2": { "optional": true },
+    "nodemailer": { "optional": true },
+    "pg": { "optional": true }
   },
   "dependencies": {
     "@hono/node-server": "^1.19.0",

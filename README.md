@@ -72,7 +72,7 @@ bunx pubflow start native my-app
 `bun add` the library. You do not need the rest of Pubflow.
 
 ```bash
-bun add @pubflow/native@^0.1.5 @tanstack/react-router hono react react-dom
+bun add @pubflow/native@^1.0.0 @tanstack/react-router hono react react-dom
 bun add -d vite
 ```
 

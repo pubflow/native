@@ -45,4 +45,9 @@ FLOWLESS_URL=http://localhost:8787
 BRIDGE_SECRET=
 ```
 
-`PUBFLOW_PUBLIC_*` / `VITE_*` go in the browser (`PubflowProvider` `baseUrl` + `X-Bridge-Secret`). The unprefixed names are the same strings for `requireAuth()`. `BRIDGE_VALIDATION_SECRET` is an alias of `BRIDGE_SECRET`. Header `X-Bridge-Secret` on `POST /auth/bridge/validate`. `DATABASE_URL` is the only app secret.
+`PUBFLOW_PUBLIC_*` / `VITE_*` go in the browser (`PubflowProvider` `baseUrl` + `X-Bridge-Secret`). The unprefixed names are the same strings for `requireAuth()`. `BRIDGE_VALIDATION_SECRET` is an alias of `BRIDGE_SECRET`. Header `X-Bridge-Secret` on `POST /auth/bridge/validate`.
+
+After Flowless validates, Native may bind IP/User-Agent (`AUTH_VALIDATION_MODE`, default `STANDARD`). See [Security](./security.md). Forgot/reset in the Default starter call Flowless `/auth/password-reset/*`.
+
+`DATABASE_URL` is an app secret, not an auth secret. Full env list: [Env](./env.md).
+

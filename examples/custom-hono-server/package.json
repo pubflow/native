@@ -14,7 +14,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@pubflow/native": "^0.1.5",
+    "@pubflow/native": "^1.0.0",
     "@tanstack/react-router": "^1.131.0",
     "hono": "^4.9.0",
     "react": "^19.1.0",

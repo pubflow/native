@@ -264,10 +264,10 @@ export const INDEX_HTML = ${JSON.stringify(htmlTemplate)}
   }
 
   return `import { Hono } from 'hono'
-import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 import { createActionsApp } from '@pubflow/native/actions'
 import { createApiApp } from '@pubflow/native/api'
+import { corsFromEnv } from '@pubflow/native/http'
 import { createPageHandler } from '@pubflow/native/pages'
 import { getRouter } from './router'
 
@@ -278,20 +278,30 @@ const actionModules = import.meta.glob('../../app/actions/**/*.{ts,js}', { eager
 
 const app = new Hono()
 app.use('*', logger())
-app.use('*', cors())
+app.use('*', corsFromEnv())
 const api = createApiApp(apiModules)
 api.route('/actions', createActionsApp(actionModules))
 app.route('/api', api)
 app.get('/health', (c) => c.json({ ok: true, name: 'pubflow-native' }))
 app.get('/openapi.json', (c) => c.json({
   openapi: '3.0.0',
-  info: { title: 'Pubflow Native', version: '0.1.0' },
+  info: { title: 'Pubflow Native', version: '1.0.0' },
   paths: {},
 }))
 app.all('*', createPageHandler(getRouter, INDEX_HTML))
 
 export default app
 `
+}
+
+function writeIfChanged(filePath: string, source: string): boolean {
+  try {
+    if (fs.existsSync(filePath) && fs.readFileSync(filePath, 'utf8') === source) return false
+  } catch {
+    // rewrite on read errors
+  }
+  fs.writeFileSync(filePath, source)
+  return true
 }
 
 function collectActionIds(root: string): string[] {
@@ -342,6 +352,7 @@ export type CodegenResult = {
   files: string[]
   customServer: boolean
   warnings: string[]
+  changed: boolean
 }
 
 export function generateNative(root: string, htmlTemplate = ''): CodegenResult {
@@ -368,13 +379,15 @@ export function generateNative(root: string, htmlTemplate = ''): CodegenResult {
     'types.d.ts': emitTypes(root, pages),
     '.gitignore': emitGitignore(),
   }
+  let changed = false
   for (const [name, source] of Object.entries(files)) {
-    fs.writeFileSync(path.join(dir, name), source)
+    if (writeIfChanged(path.join(dir, name), source)) changed = true
   }
   return {
     dir,
     files: Object.keys(files).map((name) => toPosix(path.join(dir, name))),
     customServer: hasCustomServer(root),
     warnings: allWarnings,
+    changed,
   }
 }

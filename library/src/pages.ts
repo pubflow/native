@@ -4,12 +4,27 @@ import { renderPage, type RouterFactory } from './ssr.tsx'
 
 export type { RouterFactory }
 
+/** Server paths that must never run TanStack SSR. */
+export function shouldSkipPages(pathname: string): boolean {
+  const path = (pathname.split('?')[0] || '/').replace(/\/+$/, '') || '/'
+  if (path === '/health' || path === '/openapi.json') return true
+  if (path === '/api' || path.startsWith('/api/')) return true
+  if (path === '/rpc' || path.startsWith('/rpc/')) return true
+  return false
+}
+
 /**
  * Hono handler that SSR-renders TanStack Router pages.
  * Used by the generated server and by custom `app/server.ts`.
  */
 export function createPageHandler(getRouter: RouterFactory, indexHtml = '') {
-  return async (c: Context) => renderPage(c, getRouter, indexHtml)
+  return async (c: Context, next: Next) => {
+    if (shouldSkipPages(new URL(c.req.url).pathname)) {
+      await next()
+      return
+    }
+    return renderPage(c, getRouter, indexHtml)
+  }
 }
 
 /**
@@ -22,6 +37,10 @@ export function createPageHandler(getRouter: RouterFactory, indexHtml = '') {
  */
 export function pages(getRouter?: RouterFactory, indexHtml?: string) {
   return async (c: Context, next: Next) => {
+    if (shouldSkipPages(new URL(c.req.url).pathname)) {
+      await next()
+      return
+    }
     if (!getRouter) {
       try {
         const generated = await import('virtual:pubflow-native/router')

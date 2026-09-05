@@ -61,4 +61,6 @@ Pages stay thin the same way: `app/pages/items/[id].tsx` receives `{ id }` and `
 
 ## Custom `app/server.ts`
 
-When this file exists, it **replaces** the generated handler. Use it for CORS, extra paths (`/rpc`), OpenAPI, or to mount globbed APIs yourself. See [API](./api.md) and [`examples/custom-hono-server`](../examples/custom-hono-server).
+When this file exists, it **replaces** the generated handler. Use it for extra paths (`/rpc`), OpenAPI, or to mount globbed APIs yourself. CORS is `corsFromEnv()` from `@pubflow/native/http` (see [Security](./security.md)). See [API](./api.md) and [`examples/custom-hono-server`](../examples/custom-hono-server).
+
+`import.meta.glob('./api/**/*.{ts,js}')` is enough — Native normalizes `./api/items.ts` the same as `../../app/api/items.ts`. You do not need a second `app.route('/api/hello', hello)` for the globbed file to exist (an extra mount is only a demo). `app.all('*', pages())` skips `/api`, `/health`, `/openapi.json`, and `/rpc` so TanStack never SSR those paths.

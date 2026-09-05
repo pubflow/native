@@ -2,6 +2,7 @@ import type { Context, MiddlewareHandler, Next } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import { getCookie } from 'hono/cookie'
 import { isAnyType, parseAllowedTypes, sessionAllowed, type ActionSession } from './access.ts'
+import { applySessionSecurity } from './session-security.ts'
 
 export type SessionData = ActionSession & {
   expires_at?: string
@@ -62,9 +63,21 @@ async function flowlessValidate(sessionId: string): Promise<SessionData> {
   }
 }
 
+/** Real session kill on Flowless. Used only when STRICT + AUTH_AUTO_INVALIDATE. */
+export async function flowlessLogout(sessionId: string): Promise<void> {
+  const headers: Record<string, string> = { 'X-Session-ID': sessionId }
+  const secret = bridgeSecret()
+  if (secret) headers['X-Bridge-Secret'] = secret
+  const response = await fetch(`${flowlessUrl()}/auth/logout`, { method: 'POST', headers })
+  if (!response.ok) {
+    throw new Error(`Flowless logout failed (${response.status})`)
+  }
+}
+
 /**
  * Build `requireAuth` / `requireRole` with any session validator.
  * If `c.get('session')` is already set, Flowless (or your adapter) is not called again.
+ * After a successful validate, Native binds IP/UA (`AUTH_VALIDATION_MODE`).
  */
 export function createAuth(validateSession: (sessionId: string) => Promise<SessionData>) {
   async function loadSession(c: Context): Promise<SessionData> {
@@ -77,6 +90,7 @@ export function createAuth(validateSession: (sessionId: string) => Promise<Sessi
       })
     }
     const session = await validateSession(sessionId)
+    await applySessionSecurity(c, sessionId, { logout: flowlessLogout })
     c.set('session', session)
     c.set('user_id', session.user_id)
     return session

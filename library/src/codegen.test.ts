@@ -28,6 +28,8 @@ describe('generateNative', () => {
     const server = fs.readFileSync(path.join(root, '.pubflow', 'generated', 'server.ts'), 'utf8')
     expect(server).toContain('createActionsApp')
     expect(server).toContain("api.route('/actions'")
+    expect(server).toContain('corsFromEnv')
+    expect(server).toContain('1.0.0')
     fs.rmSync(root, { recursive: true, force: true })
   })
 
@@ -60,6 +62,19 @@ describe('generateNative', () => {
     const router = fs.readFileSync(path.join(root, '.pubflow', 'generated', 'router.tsx'), 'utf8')
     expect(router).not.toContain("from '../../app/pages/products'")
     expect(router).toContain("from '../../app/pages/products/index'")
+    fs.rmSync(root, { recursive: true, force: true })
+  })
+
+  it('does not rewrite generated files when content is unchanged', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'pubflow-native-codegen-'))
+    writePage(root, 'index.tsx')
+    const first = generateNative(root)
+    expect(first.changed).toBe(true)
+    const router = path.join(root, '.pubflow', 'generated', 'router.tsx')
+    const before = fs.statSync(router).mtimeMs
+    const second = generateNative(root)
+    expect(second.changed).toBe(false)
+    expect(fs.statSync(router).mtimeMs).toBe(before)
     fs.rmSync(root, { recursive: true, force: true })
   })
 })

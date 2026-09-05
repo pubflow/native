@@ -13,7 +13,26 @@
     "email": "Email",
     "password": "Password",
     "error": "Could not sign in. Check your Flowless URL and credentials.",
-    "noAccount": "No account?"
+    "noAccount": "No account?",
+    "forgot": "Forgot password?"
+  },
+  "passwordReset": {
+    "link": "Forgot password?",
+    "title": "Reset your password",
+    "subtitle": "We’ll email reset instructions if the account exists.",
+    "submit": "Send instructions",
+    "sent": "If the account exists, reset instructions were sent.",
+    "requestError": "Could not send reset instructions.",
+    "resetTitle": "Choose a new password",
+    "resetSubtitle": "Use the token from your email link.",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "resetSubmit": "Update password",
+    "success": "Password updated. Sign in.",
+    "resetError": "Could not reset the password.",
+    "mismatch": "Passwords do not match.",
+    "passwordLength": "Password must be at least 6 characters.",
+    "missingToken": "This page needs a reset token from your email."
   },
   "register": {
     "title": "Create your account",

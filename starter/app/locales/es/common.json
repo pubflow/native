@@ -15,6 +15,24 @@
     "error": "No se pudo entrar. Revisa la URL de Flowless y las credenciales.",
     "noAccount": "¿Sin cuenta?"
   },
+  "passwordReset": {
+    "link": "¿Olvidaste la contraseña?",
+    "title": "Restablece tu contraseña",
+    "subtitle": "Si la cuenta existe, te enviaremos instrucciones.",
+    "submit": "Enviar instrucciones",
+    "sent": "Si la cuenta existe, se enviaron las instrucciones.",
+    "requestError": "No se pudieron enviar las instrucciones.",
+    "resetTitle": "Elige una contraseña nueva",
+    "resetSubtitle": "Usa el token del enlace del correo.",
+    "newPassword": "Contraseña nueva",
+    "confirmPassword": "Confirmar contraseña",
+    "resetSubmit": "Actualizar contraseña",
+    "success": "Contraseña actualizada. Inicia sesión.",
+    "resetError": "No se pudo restablecer la contraseña.",
+    "mismatch": "Las contraseñas no coinciden.",
+    "passwordLength": "La contraseña debe tener al menos 6 caracteres.",
+    "missingToken": "Esta página necesita el token del correo."
+  },
   "register": {
     "title": "Crea tu cuenta",
     "subtitle": "Regístrate en Flowless y luego entra.",

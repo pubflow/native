@@ -81,4 +81,24 @@ describe('createApiApp', () => {
     const res = await app.request('/products')
     expect(res.headers.get('X-Products')).toBe('1')
   })
+
+  it('mounts Vite glob keys from ./api (custom server.ts)', async () => {
+    const items = new Hono()
+    items.get('/', (c) => c.json({ items: true }))
+    const app = createApiApp({
+      './api/items.ts': { default: items },
+    })
+    const res = await app.request('/items')
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ items: true })
+  })
+
+  it('mounts glob keys from ../../app/api', async () => {
+    const items = new Hono()
+    items.get('/', (c) => c.json({ items: true }))
+    const app = createApiApp({
+      '../../app/api/items.ts': { default: items },
+    })
+    expect(await (await app.request('/items')).json()).toEqual({ items: true })
+  })
 })

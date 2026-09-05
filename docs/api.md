@@ -31,6 +31,8 @@ If `products.ts` and `products/index.ts` both exist, **the folder wins**. `produ
 
 Keep the HTTP file thin. Domain code goes in `app/lib` — see [Backend](./backend.md). Files and folders that start with `_` are **not** mounted, except `_middleware.ts`. Do not put `queries.ts` or tests under `app/api/` unless they export a Hono app you want as a route.
 
+`apiFromDir` accepts Vite glob keys from `./api/**` (custom `app/server.ts`) or `../../app/api/**` (generated server). Native strips the prefix so both mount the same. `pages()` does not SSR `/api`, `/health`, `/openapi.json`, or `/rpc`.
+
 ## Control layers
 
 0. **Convention** — files only. No root Hono in your repo.

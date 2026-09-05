@@ -16,7 +16,7 @@ function partsFromRel(rel: string): string[] {
   return toPosix(rel)
     .replace(API_EXT, '')
     .split('/')
-    .filter(Boolean)
+    .filter((part) => part && part !== '.' && part !== '..')
 }
 
 function isSkippedSegment(part: string, isLast: boolean): boolean {
@@ -25,7 +25,7 @@ function isSkippedSegment(part: string, isLast: boolean): boolean {
 }
 
 /**
- * File path relative to `app/api` (or a Vite glob key ending in `/app/api/...`).
+ * File path relative to `app/api` (or a Vite glob key under `api/`).
  * `index` collapses like pages: `products/index.ts` → `/products`.
  */
 export function parseApiRel(rel: string): ParsedApiRel {
@@ -59,10 +59,13 @@ export function parseApiRel(rel: string): ParsedApiRel {
 
 export function apiRelFromGlobKey(key: string): string {
   const posix = toPosix(key)
-  const marker = '/app/api/'
-  const idx = posix.lastIndexOf(marker)
-  const rel = idx >= 0 ? posix.slice(idx + marker.length) : posix.split('/app/api/').pop() || posix
-  return rel
+  const appMarker = '/app/api/'
+  const appIdx = posix.lastIndexOf(appMarker)
+  if (appIdx >= 0) return posix.slice(appIdx + appMarker.length)
+  const apiMarker = '/api/'
+  const apiIdx = posix.lastIndexOf(apiMarker)
+  if (apiIdx >= 0) return posix.slice(apiIdx + apiMarker.length)
+  return posix.replace(/^\.\//, '')
 }
 
 export type ApiMountCandidate<T> = T & { mount: string; rank: number; skip?: boolean; isMiddleware?: boolean }

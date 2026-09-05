@@ -38,4 +38,6 @@ Pubflow Actions are same-origin POST JSON, not RSC and not gRPC. The UI path is 
 
 Optional server auth: `import { requireAuth, requireRole } from '@pubflow/native/auth'` (Flowless). Not pulled into the client. Login UI stays `@pubflow/react`.
 
-Docs: [github.com/pubflow/native](https://github.com/pubflow/native) — [pages](https://github.com/pubflow/native/blob/master/docs/pages.md), [backend](https://github.com/pubflow/native/blob/master/docs/backend.md), [upgrade](https://github.com/pubflow/native/blob/master/docs/upgrade.md).
+Optional: `@pubflow/native/db` (Kysely), `./cache`, `./mail`, `./rate-limit`, `./http` (`getClientIp`, `corsFromEnv`). Peers are optional.
+
+Docs: [github.com/pubflow/native](https://github.com/pubflow/native) — [pages](https://github.com/pubflow/native/blob/master/docs/pages.md), [backend](https://github.com/pubflow/native/blob/master/docs/backend.md), [env](https://github.com/pubflow/native/blob/master/docs/env.md), [upgrade](https://github.com/pubflow/native/blob/master/docs/upgrade.md).

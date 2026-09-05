@@ -1,8 +1,14 @@
-import { describe, expect, it } from 'bun:test'
+import { afterEach, describe, expect, it } from 'bun:test'
 import { Hono } from 'hono'
 import { createAuth } from './auth.ts'
 import { isAnyType, parseAllowedTypes, sessionAllowed } from './access.ts'
 import type { ActionSession } from './access.ts'
+
+process.env.AUTH_VALIDATION_MODE = 'DISABLED'
+
+afterEach(() => {
+  process.env.AUTH_VALIDATION_MODE = 'DISABLED'
+})
 
 describe('isAnyType / sessionAllowed', () => {
   const session: ActionSession = { user_id: '1', user_type: 'user' }

@@ -210,7 +210,8 @@ function nativePlugin(options: NativeViteOptions = {}): Plugin {
           posix.endsWith('/app/server.ts') ||
           posix.endsWith('/index.html')
         ) {
-          regenerate('')
+          const result = regenerate('')
+          if (!result.changed) return
           const generated = generatedDir(root)
           for (const name of ['server.ts', 'router.tsx', 'client.tsx']) {
             const mods = server.moduleGraph.getModulesByFile(path.join(generated, name))

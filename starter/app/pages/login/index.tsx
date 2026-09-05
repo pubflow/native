@@ -64,6 +64,11 @@ export default function LoginPage() {
               {pending ? t('status.loading') : t('nav.login')}
             </Button>
           </form>
+          <p className="mt-3 text-sm text-muted-foreground">
+            <Link to="/forgot-password" className="text-primary underline">
+              {t('passwordReset.link')}
+            </Link>
+          </p>
           <p className="mt-4 text-sm text-muted-foreground">
             {t('login.noAccount')}{' '}
             <Link to="/register" className="text-primary underline">

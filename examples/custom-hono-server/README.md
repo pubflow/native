@@ -1,6 +1,6 @@
 # Custom Hono server
 
-When `app/server.ts` exists, it **replaces** the generated handler. You mount Hono yourself and call `pages()` / `apiFromDir()` / `actionsFromDir()` from `@pubflow/native`. Tailwind v4 is included (no shadcn). Clone this folder on its own — it does not need `starter/` or the rest of the repo.
+When `app/server.ts` exists, it **replaces** the generated handler. You mount Hono yourself and call `pages()` / `apiFromDir()` / `actionsFromDir()` from `@pubflow/native`, plus `corsFromEnv()` from `@pubflow/native/http`. Tailwind v4 is included (no shadcn). Clone this folder on its own — it does not need `starter/` or the rest of the repo.
 
 ```bash
 npx degit pubflow/native/examples/custom-hono-server my-app

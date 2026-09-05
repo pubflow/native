@@ -53,7 +53,8 @@ BRIDGE_SECRET=
 DATABASE_URL=
 ```
 
-`BRIDGE_VALIDATION_SECRET` is an alias of `BRIDGE_SECRET`. `DATABASE_URL` is the only secret and is not available in `app/pages`. Put queries in `app/api`, `app/actions`, or `app/server.ts`.
+`BRIDGE_VALIDATION_SECRET` is an alias of `BRIDGE_SECRET`. `DATABASE_URL` is optional (app starts without it) and is not available in `app/pages`. Full list: [Env](./env.md).
+
 
 Minimal and Custom Hono only need `PORT` unless you add auth yourself.
 

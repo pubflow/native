@@ -11,7 +11,15 @@ bun run dev
 
 Browse the files: [github.com/pubflow/native/tree/master/starter](https://github.com/pubflow/native/tree/master/starter). Same folder as `pubflow create native`.
 
-Pubflow / Flowless auth in this template is **optional**. Delete `app/pages/login`, dashboard guards, and `@pubflow/react` if you just want the framework.
+Pubflow / Flowless auth in this template is **optional**. Delete these if you just want the framework:
+
+- `app/pages/login`, `register`, `forgot-password`, `reset-password`, `dashboard`
+- `app/components/auth-guard.tsx`
+- unwrap `PubflowProvider` in `app/components/providers.tsx`
+- drop `@pubflow/react` / `@pubflow/core` from `package.json`
+- keep `FLOWLESS_URL` / `BRIDGE_SECRET` out of `.env`
+
+DB, cache, and mail in `@pubflow/native` do not depend on Flowless.
 
 shadcn is already set up (`components.json`, Tailwind v4). Add components with `npx shadcn@latest add dialog`. Do not run `init -t vite`.
 

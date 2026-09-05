@@ -66,3 +66,9 @@ users.get('/:id', (c) => c.json({ id: c.req.param('id') }))
 See [API](./api.md) and [Backend](./backend.md).
 
 Generated files live in `.pubflow/generated/` (gitignored). Do not mix them with `.pubflow/context/` used by the CLI.
+
+## Fast Refresh vs full reload
+
+`@vitejs/plugin-react` is on. **Components** under `app/components` and CSS/Tailwind Fast Refresh as usual.
+
+Editing `app/pages`, `app/api`, or `app/actions` regenerates `.pubflow/generated`. Native **does not rewrite** those files when the output is identical, so saving a page does not force a reload of the router. Adding/removing a route changes generated files → Vite invalidates `router.tsx` / `client.tsx` → **full reload**. That is expected when the route tree changes.
