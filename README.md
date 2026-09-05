@@ -2,9 +2,13 @@
 
 **Full-stack TypeScript framework** — React pages and a Hono API in one process. One repo, one `dev`, one deploy.
 
-Anyone can use it. It is **not** locked to Pubflow products, accounts, or auth. A blog, a SaaS, an internal tool, or a Pubflow app all look the same: `app/pages` for UI, `app/api` for server code.
+UI (`app/pages`) and the server (`app/api`, `app/actions`) live together. A blog, a SaaS, an internal tool, or a new app — yours or built with an AI — without a frontend repo and a backend repo.
 
-Hono owns `fetch`. TanStack Router is a library for file routes and SSR — not TanStack Start, not Next.js, not HonoX. The browser talks HTTP JSON to that same process. gRPC (or Hono RPC / `hc`) can sit behind Native if another service needs it; it is not a faster path for the UI.
+Secrets stay on the server. Pages cannot read `DATABASE_URL`. Queries and keys go in `app/api` or `app/actions`. The browser only sees `PUBFLOW_PUBLIC_*` / `VITE_*`.
+
+Login is optional. [Flowless](https://www.pubflow.com/products/flowless) is a trust layer: it knows **who** the user is and their **role** (admin, editor, …). The browser keeps a session id. Native asks Flowless if that session is valid, then you gate routes and Actions with `requireAuth` / `requireRole` — no extra auth stack, no secrets in the page. Skip Flowless and Native is still React + API.
+
+Anyone can use it. It is **not** locked to Pubflow products. Want the stack comparison (Next, TanStack Start, HonoX)? See [Why Native](docs/why.md).
 
 Package: [`@pubflow/native`](https://www.npmjs.com/package/@pubflow/native)
 
@@ -134,12 +138,12 @@ See [`examples/`](examples/) — Minimal and Custom Hono are cloneable apps; Clo
 
 ## What it is for
 
-- One TypeScript codebase instead of a separate frontend repo and API repo
-- Same-origin `/api` and `POST /api/actions` so secrets stay on the server
-- Hono `fetch` on Bun, Node, and Cloudflare Workers — no RSC, no Nitro, no gRPC for the UI
+- UI and API in one TypeScript app — not two repos
+- Secrets and database access on the server (`/api`, Actions); pages cannot read `DATABASE_URL`
+- Flowless as a trust layer when you want login: session id in, who + role out; `requireAuth` / `requireRole` to limit what they can do
 - File routes you already know: `layout.tsx`, `index.tsx`, `[id].tsx`
 
-Use something else for mobile (`pubflow create react-native` / Expo), a non-TS API (Go, Python, …), or an MPA/islands setup (HonoX).
+Native is web. For mobile use `pubflow create react-native` / Expo. For a non-TypeScript API use Go, Python, or Rust. For an MPA / islands app, HonoX. Details: [Why Native](docs/why.md).
 
 ## Pages and API
 
@@ -159,7 +163,7 @@ Optional env: browser `PUBFLOW_PUBLIC_*` or `VITE_*` (`publicEnv()`). Server use
 
 ## Optional Pubflow extras
 
-The starter can talk to [Flowless](https://github.com/pubflow) for login (`@pubflow/react`). That is an add-on, same as plugging any other auth. Skip it and Native is still a full-stack React + Hono app.
+[Flowless](https://github.com/pubflow) is the trust layer: who the user is, their role, and a session id Native can check. Gate `/api` and Actions with `requireAuth` / `requireRole`. Skip it if you do not need login — Native is still React + Hono. See [Auth](docs/auth.md) and [Why Native](docs/why.md).
 
 ## This repository
 
