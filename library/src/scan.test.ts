@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import { scanApi, scanPages } from './scan.ts'
+import { scanActions, scanApi, scanPages } from './scan.ts'
 
 function tmpProject() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'pubflow-native-scan-'))
@@ -13,6 +13,10 @@ function tmpProject() {
   fs.writeFileSync(path.join(root, 'app', 'api', 'users.ts'), 'export default {}')
   fs.writeFileSync(path.join(root, 'app', 'api', '_middleware.ts'), 'export default async function mw() {}')
   fs.writeFileSync(path.join(root, 'app', 'api', 'webhooks', 'stripe.ts'), 'export default {}')
+  fs.mkdirSync(path.join(root, 'app', 'actions', 'posts'), { recursive: true })
+  fs.writeFileSync(path.join(root, 'app', 'actions', 'posts', 'createPost.ts'), 'export async function createPost() {}')
+  fs.writeFileSync(path.join(root, 'app', 'actions', 'posts', '_middleware.ts'), 'export default async function mw() {}')
+  fs.writeFileSync(path.join(root, 'app', 'actions', '_auth.ts'), 'export { requireAuth } from "../lib/auth"')
   return root
 }
 
@@ -38,6 +42,17 @@ describe('scanApi', () => {
     const mw = apis.find((file) => file.rel === '_middleware.ts')
     expect(mw?.isMiddleware).toBe(true)
     expect(mw?.mount).toBe('/')
+    fs.rmSync(root, { recursive: true, force: true })
+  })
+})
+
+describe('scanActions', () => {
+  it('builds dotted prefixes and flags _middleware / _auth', () => {
+    const root = tmpProject()
+    const actions = scanActions(root)
+    expect(actions.find((file) => file.rel === 'posts/createPost.ts')?.prefix).toBe('posts.createPost')
+    expect(actions.find((file) => file.rel === 'posts/_middleware.ts')?.isMiddleware).toBe(true)
+    expect(actions.find((file) => file.rel === '_auth.ts')?.isAuth).toBe(true)
     fs.rmSync(root, { recursive: true, force: true })
   })
 })

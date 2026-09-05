@@ -1,6 +1,6 @@
 {
   "name": "@pubflow/native",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "description": "Full-stack TypeScript framework: React pages and Hono APIs in one process. Universal — not locked to Pubflow apps.",
   "type": "module",
   "license": "MIT",
@@ -58,6 +58,16 @@
       "types": "./src/env.ts",
       "import": "./dist/env.js",
       "default": "./dist/env.js"
+    },
+    "./actions": {
+      "types": "./src/actions.ts",
+      "import": "./dist/actions.js",
+      "default": "./dist/actions.js"
+    },
+    "./auth": {
+      "types": "./src/auth.ts",
+      "import": "./dist/auth.js",
+      "default": "./dist/auth.js"
     }
   },
   "peerDependencies": {

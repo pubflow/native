@@ -3,8 +3,9 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { Plugin, PluginOption, ViteDevServer } from 'vite'
 import react from '@vitejs/plugin-react'
+import { emitActionStub, listExportedFunctions } from './actions.ts'
 import { generateNative } from './codegen.ts'
-import { generatedDir } from './scan.ts'
+import { generatedDir, toPosix } from './scan.ts'
 
 export type NativeViteOptions = {
   /** Project root. Defaults to Vite config root. */
@@ -50,6 +51,36 @@ function isViteInternal(url = ''): boolean {
   return /\.(css|js|mjs|cjs|ts|tsx|jsx|mts|cts|map|json|svg|png|jpe?g|gif|webp|ico|woff2?|ttf|eot|txt|wasm|mp4|webm)(\?|$)/i.test(
     pathname,
   )
+}
+
+function actionRelFromId(id: string, root: string): string | null {
+  const file = toPosix(path.resolve(id.split('?')[0]))
+  const actionsRoot = toPosix(path.resolve(root, 'app', 'actions'))
+  if (file !== actionsRoot && !file.startsWith(`${actionsRoot}/`)) return null
+  if (!/\.(ts|js)$/.test(file) || file.endsWith('.d.ts')) return null
+  return file.slice(actionsRoot.length + 1)
+}
+
+function nativeActionsPlugin(options: NativeViteOptions = {}): Plugin {
+  let root = options.root || process.cwd()
+  return {
+    name: 'pubflow-native-actions',
+    enforce: 'pre',
+    configResolved(config) {
+      root = options.root || config.root
+    },
+    transform(code, id, opts) {
+      if (opts?.ssr) return null
+      const rel = actionRelFromId(id, root)
+      if (!rel) return null
+      const base = rel.replace(/\.(ts|js)$/, '')
+      const last = base.split('/').pop()
+      if (last === '_middleware' || last === '_auth') {
+        return { code: 'export {}\n', map: null }
+      }
+      return { code: emitActionStub(rel, listExportedFunctions(code)), map: null }
+    },
+  }
 }
 
 function nativePlugin(options: NativeViteOptions = {}): Plugin {
@@ -155,6 +186,7 @@ function nativePlugin(options: NativeViteOptions = {}): Plugin {
       const watchDirs = [
         path.join(root, 'app', 'pages'),
         path.join(root, 'app', 'api'),
+        path.join(root, 'app', 'actions'),
         path.join(root, 'app', 'server.ts'),
         path.join(root, 'index.html'),
         path.join(root, 'pubflow.config.ts'),
@@ -166,6 +198,7 @@ function nativePlugin(options: NativeViteOptions = {}): Plugin {
         if (
           posix.includes('/app/pages/') ||
           posix.includes('/app/api/') ||
+          posix.includes('/app/actions/') ||
           posix.endsWith('/app/server.ts') ||
           posix.endsWith('/index.html')
         ) {
@@ -229,7 +262,7 @@ function nativePlugin(options: NativeViteOptions = {}): Plugin {
  * ```
  */
 export default function native(options: NativeViteOptions = {}): PluginOption[] {
-  return [nativePlugin(options), react()]
+  return [nativePlugin(options), nativeActionsPlugin(options), react()]
 }
 
 export { native }

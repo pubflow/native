@@ -1,10 +1,13 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { listExportedFunctions } from './actions.ts'
 import {
+  actionId,
   customServerPath,
   generatedDir,
   hasCustomServer,
   importFromGenerated,
+  scanActions,
   scanApi,
   scanPages,
   toPosix,
@@ -220,6 +223,7 @@ export const INDEX_HTML = ${JSON.stringify(htmlTemplate)}
   return `import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
+import { createActionsApp } from '@pubflow/native/actions'
 import { createApiApp } from '@pubflow/native/api'
 import { createPageHandler } from '@pubflow/native/pages'
 import { getRouter } from './router'
@@ -227,11 +231,14 @@ import { getRouter } from './router'
 export const INDEX_HTML = ${JSON.stringify(htmlTemplate)}
 
 const apiModules = import.meta.glob('../../app/api/**/*.{ts,js}', { eager: true }) as Record<string, { default?: unknown }>
+const actionModules = import.meta.glob('../../app/actions/**/*.{ts,js}', { eager: true }) as Record<string, Record<string, unknown>>
 
 const app = new Hono()
 app.use('*', logger())
 app.use('*', cors())
-app.route('/api', createApiApp(apiModules))
+const api = createApiApp(apiModules)
+api.route('/actions', createActionsApp(actionModules))
+app.route('/api', api)
 app.get('/health', (c) => c.json({ ok: true, name: 'pubflow-native' }))
 app.get('/openapi.json', (c) => c.json({
   openapi: '3.0.0',
@@ -244,9 +251,22 @@ export default app
 `
 }
 
+function collectActionIds(root: string): string[] {
+  const ids: string[] = []
+  for (const file of scanActions(root)) {
+    if (file.isMiddleware || file.isAuth) continue
+    const source = fs.readFileSync(file.abs, 'utf8')
+    for (const name of listExportedFunctions(source)) {
+      ids.push(actionId(file.rel, name))
+    }
+  }
+  return [...new Set(ids)]
+}
+
 function emitTypes(root: string): string {
   const pages = scanPages(root)
   const apis = scanApi(root).filter((file) => !file.isMiddleware)
+  const actionIds = collectActionIds(root)
   const routes = pages
     .filter((file) => file.kind === 'index' || file.kind === 'page')
     .map((file) => {
@@ -261,6 +281,9 @@ function emitTypes(root: string): string {
 export type NativePagePath = ${unique.map((r) => JSON.stringify(r)).join(' | ')}
 export type NativeApiMount = ${
     apis.length ? apis.map((a) => JSON.stringify('/api' + a.mount)).join(' | ') : 'never'
+  }
+export type NativeActionId = ${
+    actionIds.length ? actionIds.map((id) => JSON.stringify(id)).join(' | ') : 'never'
   }
 `
 }

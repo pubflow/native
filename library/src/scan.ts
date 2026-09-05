@@ -23,6 +23,15 @@ export type ApiFile = {
   isMiddleware: boolean
 }
 
+export type ActionFile = {
+  abs: string
+  rel: string
+  /** Dotted prefix from the file path, e.g. `posts.createPost`. */
+  prefix: string
+  isMiddleware: boolean
+  isAuth: boolean
+}
+
 const PAGE_EXT = /\.(tsx|jsx|ts|js)$/
 const API_EXT = /\.(ts|js)$/
 
@@ -82,6 +91,33 @@ function fileToApiMount(rel: string): { mount: string; isMiddleware: boolean } {
     return { mount: '/' + parts.slice(0, -1).join('/'), isMiddleware: true }
   }
   return { mount: '/' + parts.join('/'), isMiddleware: false }
+}
+
+export function actionId(rel: string, exportName: string): string {
+  const parts = toPosix(rel)
+    .replace(API_EXT, '')
+    .split('/')
+    .filter(Boolean)
+  const fileBase = parts[parts.length - 1] || exportName
+  const dirParts = parts.slice(0, -1)
+  if (fileBase === exportName) return [...dirParts, exportName].join('.')
+  return [...parts, exportName].join('.')
+}
+
+export function scanActions(root: string): ActionFile[] {
+  const actionsRoot = path.join(root, 'app', 'actions')
+  return walkFiles(actionsRoot)
+    .filter((abs) => API_EXT.test(abs) && !abs.endsWith('.d.ts'))
+    .map((abs) => {
+      const rel = toPosix(path.relative(actionsRoot, abs))
+      const parts = rel.replace(API_EXT, '').split('/').filter(Boolean)
+      const last = parts[parts.length - 1]
+      const isMiddleware = last === '_middleware'
+      const isAuth = last === '_auth'
+      const prefix = parts.filter((part) => part !== '_middleware' && part !== '_auth').join('.')
+      return { abs, rel, prefix, isMiddleware, isAuth }
+    })
+    .sort((a, b) => a.rel.localeCompare(b.rel))
 }
 
 export function scanApi(root: string): ApiFile[] {
