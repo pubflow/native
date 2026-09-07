@@ -13,5 +13,12 @@
   },
   "observability": {
     "enabled": true
+  },
+  // Postgres/MySQL on Workers: create Hyperdrive (dashboard or wrangler), then paste the id:
+  // "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "<id>" }],
+  "alias": {
+    "redis": "./optional-node-stub.js",
+    "ioredis": "./optional-node-stub.js",
+    "nodemailer": "./optional-node-stub.js"
   }
 }

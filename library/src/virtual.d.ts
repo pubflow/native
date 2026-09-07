@@ -15,3 +15,7 @@ declare module 'virtual:pubflow-native/server' {
 }
 
 declare module 'virtual:pubflow-native/client' {}
+
+declare module 'ioredis'
+declare module 'redis'
+declare module 'nodemailer'

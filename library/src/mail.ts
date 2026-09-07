@@ -110,8 +110,7 @@ function subjectFromHtml(html: string, fallback: string): string {
 }
 
 async function sendSmtp(transport: MailTransport, from: string, fromName: string, replyTo: string, message: MailMessage) {
-  const spec = 'nodemailer'
-  const nodemailer = (await import(spec)) as {
+  const nodemailer = (await import(/* @vite-ignore */ 'nodemailer')) as {
     createTransport: (opts: unknown) => { sendMail: (opts: unknown) => Promise<unknown> }
     default?: { createTransport: (opts: unknown) => { sendMail: (opts: unknown) => Promise<unknown> } }
   }

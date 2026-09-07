@@ -12,6 +12,7 @@ Pubflow Native is a **full-stack app framework**: React pages and Hono APIs in *
 - [Data and env](./data-env.md)
 - [Env](./env.md)
 - [Database](./db.md)
+- [Hyperdrive](./hyperdrive.md)
 - [Cache](./cache.md)
 - [Mail](./mail.md)
 - [Security](./security.md)

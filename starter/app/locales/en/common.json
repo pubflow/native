@@ -5,7 +5,8 @@
   "nav": {
     "dashboard": "Dashboard",
     "login": "Sign in",
-    "logout": "Sign out"
+    "logout": "Sign out",
+    "language": "Language"
   },
   "login": {
     "title": "Welcome back",
@@ -84,6 +85,7 @@
   "status": {
     "protected": "Protected",
     "loading": "Loading",
+    "redirecting": "Redirecting to sign in",
     "forbidden": "You do not have access to this page"
   }
 }

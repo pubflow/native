@@ -1,5 +1,7 @@
 # Custom Hono server
 
+<a href="https://deploy.workers.cloudflare.com/?url=https://github.com/pubflow/native/tree/master/examples/custom-hono-server"><img src="https://cloud.notside.com/deploy-to-cloudflare.svg" alt="Deploy to Cloudflare" height="32" /></a>
+
 When `app/server.ts` exists, it **replaces** the generated handler. You mount Hono yourself and call `pages()` / `apiFromDir()` / `actionsFromDir()` from `@pubflow/native`, plus `corsFromEnv()` from `@pubflow/native/http`. Tailwind v4 is included (no shadcn). Clone this folder on its own — it does not need `starter/` or the rest of the repo.
 
 ```bash

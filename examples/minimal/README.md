@@ -1,5 +1,7 @@
 # Minimal Pubflow Native
 
+<a href="https://deploy.workers.cloudflare.com/?url=https://github.com/pubflow/native/tree/master/examples/minimal"><img src="https://cloud.notside.com/deploy-to-cloudflare.svg" alt="Deploy to Cloudflare" height="32" /></a>
+
 One app: pages, Tailwind v4, and `/api`. No auth, no shadcn. Clone this folder on its own — it does not need `starter/` or the rest of the repo.
 
 ```bash

@@ -9,4 +9,12 @@
 
 Keys are strings. `set(key, value, ttlSeconds)`.
 
-Rate limit middleware uses `getClientIp` (or `X-Session-ID` when `key: 'session'`). Presets: `login` (5 / 15 min), `api` (120 / 60s). The Default starter applies the API preset in `app/api/_middleware.ts`.
+Rate limit is **opt-in**. Put it on the route you care about — Native does not apply it globally.
+
+```ts
+import { rateLimit } from '@pubflow/native/rate-limit'
+
+products.get('/', rateLimit({ max: 60, windowSeconds: 60 }), (c) => c.json(listProducts()))
+```
+
+Presets: `login` (5 / 15 min), `api` (120 / 60s). Uses `getClientIp`, or `X-Session-ID` when `key: 'session'`.

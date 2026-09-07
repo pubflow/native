@@ -2,9 +2,16 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { Plugin, PluginOption, ViteDevServer } from 'vite'
+import { loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { emitActionStub, listExportedFunctions } from './actions.ts'
 import { generateNative } from './codegen.ts'
+import {
+  databaseUrlFromEnv,
+  HYPERDRIVE_HINT,
+  shouldWarnHyperdrive,
+  wranglerConfigSource,
+} from './hyperdrive-hint.ts'
 import { generatedDir, toPosix } from './scan.ts'
 
 export type NativeViteOptions = {
@@ -21,17 +28,29 @@ const VIRTUAL = {
 const CLIENT_DEV_SCRIPT = '/.pubflow/generated/client.tsx'
 const CLIENT_BUILD_SCRIPT = '/assets/client.js'
 
+const OPTIONAL_SSR_EXTERNALS = [
+  'ioredis',
+  'redis',
+  'nodemailer',
+  'kysely',
+  'pg',
+  'mysql2',
+  '@libsql/client',
+  '@libsql/kysely-libsql',
+]
+
 function resolveEntry(libraryRoot: string, name: string): string {
   const js = path.resolve(libraryRoot, `${name}.js`)
   if (fs.existsSync(js)) return js
   return path.resolve(libraryRoot, `${name}.ts`)
 }
 
-function loadHtml(root: string): string {
+function loadHtml(root: string, builtFirst = false): string {
   const built = path.join(root, 'dist', 'client', 'index.html')
   const src = path.join(root, 'index.html')
-  if (fs.existsSync(built)) return fs.readFileSync(built, 'utf8')
+  if (builtFirst && fs.existsSync(built)) return fs.readFileSync(built, 'utf8')
   if (fs.existsSync(src)) return fs.readFileSync(src, 'utf8')
+  if (fs.existsSync(built)) return fs.readFileSync(built, 'utf8')
   return ''
 }
 
@@ -87,6 +106,8 @@ function nativePlugin(options: NativeViteOptions = {}): Plugin {
   let root = options.root || process.cwd()
   let isSsrBuild = false
   let command: 'build' | 'serve' = 'serve'
+  let mode = 'production'
+  let hyperdriveHintShown = false
 
   const regenerate = (html = '') => {
     const result = generateNative(root, html)
@@ -96,18 +117,37 @@ function nativePlugin(options: NativeViteOptions = {}): Plugin {
     return result
   }
 
+  const warnHyperdriveIfNeeded = () => {
+    if (hyperdriveHintShown || !isSsrBuild) return
+    const loaded = loadEnv(mode, root, '')
+    const env = { ...loaded, ...process.env }
+    if (
+      !shouldWarnHyperdrive({
+        isSsrBuild: true,
+        wranglerSource: wranglerConfigSource(root),
+        databaseUrl: databaseUrlFromEnv(env),
+        databaseProvider: env.DATABASE_PROVIDER,
+      })
+    ) {
+      return
+    }
+    hyperdriveHintShown = true
+    console.warn(HYPERDRIVE_HINT)
+  }
+
   return {
     name: 'pubflow-native',
     configResolved(config) {
       root = options.root || config.root
       isSsrBuild = Boolean(config.build.ssr)
-      regenerate(isSsrBuild ? loadHtml(root) : '')
+      mode = config.mode
+      regenerate(isSsrBuild ? loadHtml(root, true) : '')
     },
     config(_config, env) {
       root = options.root || _config.root || root
       command = env.command
       const ssr = env.isSsrBuild
-      regenerate(ssr ? loadHtml(root) : '')
+      regenerate(ssr ? loadHtml(root, true) : '')
       const gen = generatedDir(root)
       const libraryRoot = path.dirname(fileURLToPath(import.meta.url))
       const nodeEntry = resolveEntry(libraryRoot, 'node-entry')
@@ -125,6 +165,7 @@ function nativePlugin(options: NativeViteOptions = {}): Plugin {
         },
         ssr: {
           noExternal: ['@pubflow/native'],
+          external: OPTIONAL_SSR_EXTERNALS,
         },
         optimizeDeps: {
           exclude: ['@pubflow/native'],
@@ -149,6 +190,7 @@ function nativePlugin(options: NativeViteOptions = {}): Plugin {
                   bun: bunEntry,
                   worker: workerEntry,
                 } as Record<string, string>,
+                external: OPTIONAL_SSR_EXTERNALS,
                 output: {
                   entryFileNames: '[name].js',
                   format: 'es',
@@ -174,6 +216,9 @@ function nativePlugin(options: NativeViteOptions = {}): Plugin {
       }
     },
     resolveId(id) {
+      if (OPTIONAL_SSR_EXTERNALS.includes(id)) {
+        return { id, external: true }
+      }
       if (id === VIRTUAL.router || id === '/@pubflow-native/router.tsx') {
         return path.join(generatedDir(root), 'router.tsx')
       }
@@ -248,6 +293,12 @@ function nativePlugin(options: NativeViteOptions = {}): Plugin {
         return [
           {
             tag: 'script',
+            children:
+              'globalThis.process=globalThis.process||{env:{}};globalThis.process.env=globalThis.process.env||{};',
+            injectTo: 'head-prepend',
+          },
+          {
+            tag: 'script',
             attrs: {
               type: 'module',
               src: command === 'build' ? CLIENT_BUILD_SCRIPT : CLIENT_DEV_SCRIPT,
@@ -258,7 +309,8 @@ function nativePlugin(options: NativeViteOptions = {}): Plugin {
       },
     },
     buildStart() {
-      regenerate(isSsrBuild ? loadHtml(root) : '')
+      regenerate(isSsrBuild ? loadHtml(root, true) : '')
+      warnHyperdriveIfNeeded()
     },
   }
 }

@@ -233,8 +233,16 @@ function emitRouter(root: string, files: PageFile[], htmlTemplate = ''): string 
   return `${imports.join('\n')}\n\n${body.join('\n')}\n`
 }
 
+function emitProcessShim(): string {
+  return `const g = globalThis as typeof globalThis & { process?: { env: Record<string, string | undefined> } }
+if (!g.process) g.process = { env: {} }
+if (!g.process.env) g.process.env = {}
+`
+}
+
 function emitClient(): string {
-  return `import { hydrateRoot, createRoot } from 'react-dom/client'
+  return `import './process-shim.ts'
+import { hydrateRoot, createRoot } from 'react-dom/client'
 import { RouterProvider, createBrowserHistory } from '@tanstack/react-router'
 import { getRouter } from './router'
 
@@ -374,6 +382,7 @@ export function generateNative(root: string, htmlTemplate = ''): CodegenResult {
   const allWarnings = [...warnings, ...apiWarnings]
   const files = {
     'router.tsx': emitRouter(root, pages, htmlTemplate),
+    'process-shim.ts': emitProcessShim(),
     'client.tsx': emitClient(),
     'server.ts': emitServer(root, htmlTemplate),
     'types.d.ts': emitTypes(root, pages),

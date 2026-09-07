@@ -13,4 +13,10 @@ bun run deploy:cf
 
 Or `pubflow create native my-app`.
 
-One Worker is pages + API. `DATABASE_URL` is a secret (`wrangler secret put`). `FLOWLESS_URL` and `BRIDGE_SECRET` (or `BRIDGE_VALIDATION_SECRET`) are normal vars — the same public strings as `PUBFLOW_PUBLIC_FLOWLESS_URL` / `PUBFLOW_PUBLIC_BRIDGE_SECRET` on the client.
+One Worker is pages + API. `FLOWLESS_URL` and `BRIDGE_SECRET` (or `BRIDGE_VALIDATION_SECRET`) are normal vars — the same public strings as `PUBFLOW_PUBLIC_FLOWLESS_URL` / `PUBFLOW_PUBLIC_BRIDGE_SECRET` on the client.
+
+Database:
+
+- **No database** — clone / Deploy to Cloudflare. Do not edit `wrangler.jsonc`.
+- **Turso** — `wrangler secret put DATABASE_URL` with `libsql://...?authToken=`. HTTP. No Hyperdrive.
+- **Postgres / MySQL** — extra step: create Hyperdrive, uncomment the binding. See [Hyperdrive](../../docs/hyperdrive.md).

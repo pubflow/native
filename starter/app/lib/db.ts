@@ -1,1 +1,1 @@
-export { getDb, createDb, parseDatabaseUrl } from '@pubflow/native/db'
+export { getDb, createDb, parseDatabaseUrl, bindWorkerEnv } from '@pubflow/native/db'

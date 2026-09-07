@@ -26,6 +26,14 @@ Pages cannot read `DATABASE_URL`. Put queries and secrets in `app/api` or `app/a
 
 ## New app: clone [starter/](https://github.com/pubflow/native/tree/master/starter)
 
+Deploy on Cloudflare (clones that folder into your account):
+
+| App | Deploy |
+| --- | --- |
+| Default | <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/pubflow/native/tree/master/starter"><img src="https://cloud.notside.com/deploy-to-cloudflare.svg" alt="Deploy to Cloudflare" height="32" /></a> |
+| Minimal | <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/pubflow/native/tree/master/examples/minimal"><img src="https://cloud.notside.com/deploy-to-cloudflare.svg" alt="Deploy to Cloudflare" height="32" /></a> |
+| Custom Hono | <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/pubflow/native/tree/master/examples/custom-hono-server"><img src="https://cloud.notside.com/deploy-to-cloudflare.svg" alt="Deploy to Cloudflare" height="32" /></a> |
+
 That folder **is** the app. `git clone` on the repo URL would pull library, docs, and examples too. Clone **only** `starter/`:
 
 ```bash

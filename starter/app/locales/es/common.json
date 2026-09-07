@@ -5,7 +5,8 @@
   "nav": {
     "dashboard": "Panel",
     "login": "Entrar",
-    "logout": "Salir"
+    "logout": "Salir",
+    "language": "Idioma"
   },
   "login": {
     "title": "Bienvenido",
@@ -13,7 +14,8 @@
     "email": "Correo",
     "password": "Contraseña",
     "error": "No se pudo entrar. Revisa la URL de Flowless y las credenciales.",
-    "noAccount": "¿Sin cuenta?"
+    "noAccount": "¿Sin cuenta?",
+    "forgot": "¿Olvidaste la contraseña?"
   },
   "passwordReset": {
     "link": "¿Olvidaste la contraseña?",

@@ -1,5 +1,7 @@
 # Pubflow Native starter
 
+<a href="https://deploy.workers.cloudflare.com/?url=https://github.com/pubflow/native/tree/master/starter"><img src="https://cloud.notside.com/deploy-to-cloudflare.svg" alt="Deploy to Cloudflare" height="32" /></a>
+
 This folder **is** the app. Clone it on its own (not the whole `pubflow/native` repo):
 
 ```bash

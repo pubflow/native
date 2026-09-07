@@ -3,12 +3,12 @@ import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { Providers, useTheme } from '@/components/providers'
 import { Button } from '@/components/ui/button'
+import { canonicalLang, supportedLanguages } from '@/lib/i18n'
 import { PUBFLOW_CONFIG } from '@/lib/pubflow-config'
 
 function BrandMark() {
-  const { theme } = useTheme()
-  const dark = theme === 'dark' || (theme === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches)
-  const src = dark && PUBFLOW_CONFIG.APP_LOGO_DARK ? PUBFLOW_CONFIG.APP_LOGO_DARK : PUBFLOW_CONFIG.APP_LOGO
+  const { resolved } = useTheme()
+  const src = resolved === 'dark' && PUBFLOW_CONFIG.APP_LOGO_DARK ? PUBFLOW_CONFIG.APP_LOGO_DARK : PUBFLOW_CONFIG.APP_LOGO
   if (src) {
     return <img src={src} alt={PUBFLOW_CONFIG.APP_NAME} className="h-7 w-auto" />
   }
@@ -17,7 +17,8 @@ function BrandMark() {
 
 function Shell({ children }: { children: ReactNode }) {
   const { t, i18n } = useTranslation()
-  const { theme, setTheme } = useTheme()
+  const { resolved, setTheme } = useTheme()
+  const lang = canonicalLang(i18n.resolvedLanguage || i18n.language)
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -33,17 +34,26 @@ function Shell({ children }: { children: ReactNode }) {
             <Link to="/dashboard" className="rounded-md px-3 py-1.5 text-sm hover:bg-muted">
               {t('nav.dashboard')}
             </Link>
-            <Button variant="outline" size="sm" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
-              {theme === 'dark' ? t('theme.light') : t('theme.dark')}
+            <Button variant="outline" size="sm" onClick={() => setTheme(resolved === 'dark' ? 'light' : 'dark')}>
+              {resolved === 'dark' ? t('theme.light') : t('theme.dark')}
             </Button>
             {PUBFLOW_CONFIG.LANGUAGE_LOCKED ? null : (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => i18n.changeLanguage(i18n.language?.startsWith('es') ? 'en' : 'es')}
+              <select
+                aria-label={t('nav.language')}
+                className="h-8 rounded-md border border-border bg-background px-3 text-xs font-medium"
+                value={lang}
+                onChange={(event) => {
+                  const next = canonicalLang(event.target.value)
+                  void i18n.changeLanguage(next)
+                  window.localStorage.setItem('i18nextLng', next)
+                }}
               >
-                {i18n.language?.startsWith('es') ? 'EN' : 'ES'}
-              </Button>
+                {supportedLanguages.map((item) => (
+                  <option key={item.code} value={item.code}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
             )}
           </nav>
         </div>

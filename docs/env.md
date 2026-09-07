@@ -29,4 +29,4 @@ Keep `.env.example` short. Copy it, fill what you use, ignore the rest. Native a
 
 `NEON_DATABASE_URL`, `PLANETSCALE_DATABASE_URL`, `TURSO_*`, `CORS_METHODS`, `CORS_HEADERS`, `AUTH_IP_VALIDATION`, `AUTH_AUTO_INVALIDATE`, MCU URLs. Put Neon / PlanetScale / Turso in **`DATABASE_URL`**. Turso token: `?authToken=` on that URL (or `TURSO_AUTH_TOKEN` if you must).
 
-See [Database](./db.md), [Cache](./cache.md), [Mail](./mail.md), [Security](./security.md).
+See [Database](./db.md), [Hyperdrive](./hyperdrive.md) (Workers + Postgres/MySQL only), [Cache](./cache.md), [Mail](./mail.md), [Security](./security.md).

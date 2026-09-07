@@ -1,7 +1,11 @@
-import { describe, expect, it } from 'bun:test'
-import { parseDatabaseUrl } from './db.ts'
+import { afterEach, describe, expect, it } from 'bun:test'
+import { bindWorkerEnv, parseDatabaseUrl, unbindWorkerEnv } from './db.ts'
 
 describe('parseDatabaseUrl', () => {
+  afterEach(() => {
+    unbindWorkerEnv()
+  })
+
   it('detects postgres, neon, mysql, planetscale, and libsql', () => {
     expect(parseDatabaseUrl({ DATABASE_URL: 'postgres://u:p@localhost:5432/db' })?.provider).toBe('postgres')
     expect(parseDatabaseUrl({ DATABASE_URL: 'postgresql://u:p@ep-x.us-east-1.aws.neon.tech/neondb' })?.provider).toBe(
@@ -41,5 +45,40 @@ describe('parseDatabaseUrl', () => {
   it('returns null without a URL and accepts documented fallbacks', () => {
     expect(parseDatabaseUrl({})).toBeNull()
     expect(parseDatabaseUrl({ NEON_DATABASE_URL: 'postgres://u:p@ep-x.neon.tech/db' })?.provider).toBe('neon')
+  })
+
+  it('prefers Hyperdrive connectionString over DATABASE_URL and marks hyperdrive', () => {
+    const parsed = parseDatabaseUrl({
+      DATABASE_URL: 'postgres://local/db',
+      HYPERDRIVE: { connectionString: 'postgres://edge:secret@hyperdrive.example/app' },
+    })
+    expect(parsed?.provider).toBe('postgres')
+    expect(parsed?.url).toBe('postgres://edge:secret@hyperdrive.example/app')
+    expect(parsed?.hyperdrive).toBe(true)
+  })
+
+  it('detects mysql Hyperdrive and keeps host fields for mysql2', () => {
+    const parsed = parseDatabaseUrl({
+      HYPERDRIVE: {
+        connectionString: 'mysql://u:p@hyperdrive.example:3306/shop',
+        host: 'hyperdrive.example',
+        port: 3306,
+        user: 'u',
+        password: 'p',
+        database: 'shop',
+      },
+    })
+    expect(parsed?.provider).toBe('mysql')
+    expect(parsed?.hyperdrive).toBe(true)
+    expect(parsed?.hyperdriveBinding?.host).toBe('hyperdrive.example')
+  })
+
+  it('reads HYPERDRIVE from bindWorkerEnv when getDb env is omitted', () => {
+    bindWorkerEnv({
+      HYPERDRIVE: { connectionString: 'postgres://bound:pw@hd.example/db' },
+    })
+    const parsed = parseDatabaseUrl()
+    expect(parsed?.url).toBe('postgres://bound:pw@hd.example/db')
+    expect(parsed?.hyperdrive).toBe(true)
   })
 })
