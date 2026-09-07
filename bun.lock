@@ -4,6 +4,10 @@
   "workspaces": {
     "": {
       "name": "pubflow-native",
+      "devDependencies": {
+        "react": "^19.1.0",
+        "react-dom": "^19.1.0",
+      },
     },
     "examples/custom-hono-server": {
       "name": "pubflow-native-custom-server",

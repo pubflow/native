@@ -1,6 +1,9 @@
 import type { Context, MiddlewareHandler } from 'hono'
+import { forbidClient } from './client-guard.ts'
 import { getHybridCache, type HybridCache } from './cache.ts'
 import { getClientIp } from './http.ts'
+
+forbidClient('@pubflow/native/rate-limit')
 
 export type RateLimitOptions = {
   max: number

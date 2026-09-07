@@ -2,7 +2,10 @@ import type { Context, MiddlewareHandler, Next } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import { getCookie } from 'hono/cookie'
 import { isAnyType, parseAllowedTypes, sessionAllowed, type ActionSession } from './access.ts'
+import { forbidClient } from './client-guard.ts'
 import { applySessionSecurity } from './session-security.ts'
+
+forbidClient('@pubflow/native/auth')
 
 export type SessionData = ActionSession & {
   expires_at?: string

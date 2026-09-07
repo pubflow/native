@@ -2,7 +2,7 @@
   "name": "pubflow-native",
   "private": true,
   "version": "0.1.0",
-  "description": "Full Stack App Framework: React pages and Hono APIs in one process.",
+  "description": "React pages and a Hono fetch API in one process. Node, Bun, or Cloudflare Workers.",
   "workspaces": [
     "library",
     "starter",
@@ -12,9 +12,14 @@
   "scripts": {
     "build:library": "bun run --cwd library build",
     "postinstall": "bun run --cwd library build",
-    "test": "bun test library/src && bun run test:smoke",
-    "test:unit": "bun test library/src",
+    "test": "bun test library/src scripts/bench-native.test.ts && bun run test:smoke",
+    "test:unit": "bun test library/src scripts/bench-native.test.ts",
     "test:smoke": "bun scripts/smoke.mjs",
-    "typecheck": "bun run --cwd library typecheck"
+    "typecheck": "bun run --cwd library typecheck",
+    "bench": "bun scripts/bench-native.ts"
+  },
+  "devDependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   }
 }

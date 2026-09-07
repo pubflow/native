@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  library:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install
+      - run: bun test library/src scripts/bench-native.test.ts
+      - run: bun run --cwd library typecheck
+      - run: bun scripts/bench-native.ts --cpu
+
+  workers:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: starter
+            dir: starter
+          - id: minimal
+            dir: examples/minimal
+          - id: custom-hono-server
+            dir: examples/custom-hono-server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install
+      - run: bun run --cwd ${{ matrix.dir }} build
+      - run: bun scripts/bench-native.ts --sizes --check-budget --app ${{ matrix.id }}

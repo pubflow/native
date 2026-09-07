@@ -1,3 +1,7 @@
+import { forbidClient } from './client-guard.ts'
+
+forbidClient('getDb()')
+
 export type DatabaseProvider = 'postgres' | 'mysql' | 'neon' | 'planetscale' | 'libsql'
 
 /** Cloudflare Hyperdrive binding (`env.HYPERDRIVE`). */

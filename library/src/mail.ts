@@ -1,5 +1,8 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { forbidClient } from './client-guard.ts'
+
+forbidClient('@pubflow/native/mail')
 
 export type MailTransport =
   | { kind: 'off' }

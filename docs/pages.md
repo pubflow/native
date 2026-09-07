@@ -45,7 +45,7 @@ const search = useSearch({ strict: false })
 
 `useParams` from `@tanstack/react-router` also works. Search params are never mixed into props.
 
-Params are the URL. **Data is not automatic** — call `/api/*` or an Action. Pages cannot read `DATABASE_URL`.
+Params are the URL. **Data is not automatic** — call `/api/*` or an Action. The client build fails if a page imports `getDb()` or `app/api`.
 
 ```tsx
 import { Link } from '@tanstack/react-router'

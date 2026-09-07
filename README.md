@@ -1,14 +1,10 @@
-# Pubflow Native — Full Stack App Framework
+# Pubflow Native
 
-**React pages and a Hono API in one process.** One repo, one `dev`, one deploy. An **app** here is one instance, not a repo generator and not React Native.
+React pages and a Hono API in one process. The server is Hono’s `fetch` — Node, Bun, or a Cloudflare Worker, with no OpenNext and no Nitro. One repo, one `dev`, one deploy.
 
-UI (`app/pages`) and the server (`app/api`, `app/actions`) live together. A blog, a SaaS, an internal tool, or a new app — yours or built with an AI — without a frontend repo and a backend repo. Starters get you running; [Backend](docs/backend.md) is how the API grows (`app/lib`, `v1`/`v2`, `app/server.ts`).
+Native is not a new category. It is Hono + TanStack Router + a Vite plugin, with folders that keep secrets off the page: `app/pages` is UI; `app/api` and `app/actions` hold queries and `DATABASE_URL`. The **client build fails** if a page imports `getDb()`. The browser only sees `PUBFLOW_PUBLIC_*` / `VITE_*`.
 
-Secrets stay on the server. Pages cannot read `DATABASE_URL`. Queries and keys go in `app/api` or `app/actions`. The browser only sees `PUBFLOW_PUBLIC_*` / `VITE_*`.
-
-Login is optional. [Flowless](https://www.pubflow.com/products/flowless) is a trust layer: it knows **who** the user is and their **role** (admin, editor, …). The browser keeps a session id. Native asks Flowless if that session is valid, then you gate routes and Actions with `requireAuth` / `requireRole` — no extra auth stack, no secrets in the page. Skip Flowless and Native is still React + API.
-
-Anyone can use it. It is **not** locked to Pubflow products. Want the stack comparison (Next, TanStack Start, HonoX)? See [Why Native](docs/why.md).
+Anyone can use it. It is **not** locked to Pubflow products. Login via [Flowless](https://www.pubflow.com/products/flowless) is optional — skip it and Native is still React + Hono. Why this exists (and when to use Next instead): [Why Native](docs/why.md). Starters get you running; [Backend](docs/backend.md) is how the API grows (`app/lib`, `v1`/`v2`, `app/server.ts`).
 
 Package: [`@pubflow/native`](https://www.npmjs.com/package/@pubflow/native)
 
@@ -22,7 +18,7 @@ index.html
 vite.config.ts plugins: [native()]
 ```
 
-Pages cannot read `DATABASE_URL`. Put queries and secrets in `app/api` or `app/actions`. The browser only sees `PUBFLOW_PUBLIC_*` / `VITE_*`.
+The client build fails if a page imports `getDb()` or `app/api`. Put queries in `app/api` or `app/actions`. The browser only sees `PUBFLOW_PUBLIC_*` / `VITE_*`.
 
 ## New app: clone [starter/](https://github.com/pubflow/native/tree/master/starter)
 
@@ -154,8 +150,9 @@ See [`examples/`](examples/) — Minimal and Custom Hono are cloneable apps; Clo
 ## What it is for
 
 - UI and API in one TypeScript app — not two repos
-- Secrets and database access on the server (`/api`, Actions); pages cannot read `DATABASE_URL`
-- Flowless as a trust layer when you want login: session id in, who + role out; `requireAuth` / `requireRole` to limit what they can do
+- Hono `fetch` on Node, Bun, and Workers (no adapter)
+- Secrets on the server (`/api`, Actions); the client build fails if a page imports `getDb()`
+- Optional Flowless login: session id in, who + role out; `requireAuth` / `requireRole`
 - File routes you already know: `layout.tsx`, `index.tsx`, `[id].tsx`
 
 Native is web. For mobile use `pubflow create react-native` / Expo. For a non-TypeScript API use Go, Python, or Rust. For an MPA / islands app, HonoX. Details: [Why Native](docs/why.md).
@@ -183,7 +180,7 @@ Optional env: browser `PUBFLOW_PUBLIC_*` or `VITE_*` (`publicEnv()`). Server use
 
 ## Optional Pubflow extras
 
-[Flowless](https://github.com/pubflow) is the trust layer: who the user is, their role, and a session id Native can check. Gate `/api` and Actions with `requireAuth` / `requireRole`. Skip it if you do not need login — Native is still React + Hono. See [Auth](docs/auth.md) and [Why Native](docs/why.md).
+[Flowless](https://github.com/pubflow) is the trust layer (who + role). Native is the app mold, not a second auth stack. Gate `/api` and Actions with `requireAuth` / `requireRole`. Skip Flowless if you do not need login. See [Auth](docs/auth.md) and [Why Native](docs/why.md).
 
 ## This repository
 
@@ -196,4 +193,4 @@ Optional env: browser `PUBFLOW_PUBLIC_*` or `VITE_*` (`publicEnv()`). Server use
 
 Root `package.json` is private. After a library publish: bump `"@pubflow/native"` in the three templates (see [Upgrade](docs/upgrade.md)).
 
-More: [docs/](docs/)
+More: [docs/](docs/), [CHANGELOG](CHANGELOG.md)

@@ -12,6 +12,7 @@ import {
   shouldWarnHyperdrive,
   wranglerConfigSource,
 } from './hyperdrive-hint.ts'
+import { guidedClientImportError } from './client-guard.ts'
 import { generatedDir, toPosix } from './scan.ts'
 
 export type NativeViteOptions = {
@@ -78,6 +79,23 @@ function actionRelFromId(id: string, root: string): string | null {
   if (file !== actionsRoot && !file.startsWith(`${actionsRoot}/`)) return null
   if (!/\.(ts|js)$/.test(file) || file.endsWith('.d.ts')) return null
   return file.slice(actionsRoot.length + 1)
+}
+
+function nativeServerGuardPlugin(options: NativeViteOptions = {}): Plugin {
+  let root = options.root || process.cwd()
+  return {
+    name: 'pubflow-native-server-guard',
+    enforce: 'pre',
+    configResolved(config) {
+      root = options.root || config.root
+    },
+    resolveId(id, importer, opts) {
+      if (opts?.ssr || !importer) return null
+      const message = guidedClientImportError({ source: id, importer, root })
+      if (message) throw new Error(message)
+      return null
+    },
+  }
 }
 
 function nativeActionsPlugin(options: NativeViteOptions = {}): Plugin {
@@ -323,7 +341,7 @@ function nativePlugin(options: NativeViteOptions = {}): Plugin {
  * ```
  */
 export default function native(options: NativeViteOptions = {}): PluginOption[] {
-  return [nativePlugin(options), nativeActionsPlugin(options), react()]
+  return [nativeServerGuardPlugin(options), nativePlugin(options), nativeActionsPlugin(options), react()]
 }
 
 export { native }

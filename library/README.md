@@ -1,6 +1,6 @@
 # @pubflow/native
 
-**Pubflow Native — Full Stack App Framework.** React pages + Hono API in one process. Universal — any TypeScript app can use it; Pubflow auth is optional.
+React pages + Hono API in one process. Hono’s `fetch` is the server (Node, Bun, Workers). Not a new category: Hono + TanStack Router + Vite. Any TypeScript app can use it; Pubflow auth is optional.
 
 ```bash
 bun add @pubflow/native @tanstack/react-router hono react react-dom
@@ -32,7 +32,7 @@ app/lib/        domain code (not mounted)
 app/actions/    functions → POST /api/actions/<id>
 ```
 
-Pages cannot read `DATABASE_URL`. Put secrets in `app/api` or `app/actions`. Optional: `usePathParams()` from this package.
+The client build fails if a page imports `getDb()`. Put secrets in `app/api` or `app/actions`. Optional: `usePathParams()` from this package.
 
 Pubflow Actions are same-origin POST JSON, not RSC and not gRPC. The UI path is HTTP on this process; gRPC can live behind Native later if another service talks to it.
 

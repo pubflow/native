@@ -36,7 +36,7 @@ Limits from [Workers limits](https://developers.cloudflare.com/workers/platform/
 | Subrequests | 50 / request | 10,000 |
 | Startup (global scope) | 1 s | 1 s |
 
-Measured `wrangler deploy --dry-run` on these templates (Worker script only; assets extra):
+Measured `wrangler deploy --dry-run` on these templates (Worker script only; assets extra). Reproduce: build the app, then `bun scripts/bench-native.ts --sizes`. CI fails if Default exceeds **2.5 MiB** uncompressed, or Minimal / Custom Hono exceed **1.2 MiB**.
 
 | App | Uncompressed | gzip |
 | --- | --- | --- |
@@ -47,5 +47,7 @@ Measured `wrangler deploy --dry-run` on these templates (Worker script only; ass
 All three fit free and paid with a large margin.
 
 **CPU 10 ms is the free-tier constraint, not size.** Cloudflare counts CPU, not waiting on `fetch`, D1, Neon HTTP, LibSQL, or Flowless. `renderToString` of a React page **does** count. Their docs put typical SSR + auth at 10–20 ms. JSON `/api` routes on Minimal usually stay under 10 ms. Default HTML SSR can brush or exceed 10 ms; if it does consistently you get Error 1102 — use Paid (30 s). A 200 ms database round-trip does not spend CPU.
+
+Local CPU (not Cloudflare): `bun scripts/bench-native.ts --cpu` times `renderToString` of a short page vs `JSON.stringify` of a small list (`process.cpuUsage()`). JSON is much cheaper than HTML SSR on the same machine (example on a desktop: ~1.4 ms CPU per render, ~0.02 ms per JSON serialize — your numbers will differ). After `bun run deploy:cf`, `wrangler tail` shows `cpuTime` per request — that is the number that counts toward the 10 ms free-tier limit.
 
 Workers are isolate-based, not a long-lived Node process. Do not open `pg` / `mysql2` / ioredis on every request or load a whole dataset into memory. `getDb()` is a per-isolate singleton. In-memory LRU cache dies when the isolate goes cold. On Cloudflare: **Hyperdrive** for Postgres/MySQL (`getDb()` reads `env.HYPERDRIVE`, pool size 1) or LibSQL — not a Node-style TCP pool. D1 is not wired through `getDb()` yet. Redis / ioredis / nodemailer stay aliased to `optional-node-stub.js` in `wrangler.jsonc` so they are not bundled. `pg` and `mysql2` are real packages when you use Hyperdrive.
