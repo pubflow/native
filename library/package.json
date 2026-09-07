@@ -1,6 +1,6 @@
 {
   "name": "@pubflow/native",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "React pages and a Hono fetch API in one process. Node, Bun, or Cloudflare Workers. Not locked to Pubflow apps.",
   "type": "module",
   "license": "MIT",
