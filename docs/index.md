@@ -1,6 +1,6 @@
 # Pubflow Native
 
-Pubflow Native is React pages and a Hono API in **one process**. Hono’s `fetch` is the server (Node, Bun, Workers — no OpenNext). Anyone can use it — `npx degit pubflow/native/starter my-app`, or `bun add @pubflow/native`. It is Hono + TanStack Router + Vite, not a new category. Pubflow auth is optional.
+Pubflow Native is for shipping a secure full-stack TypeScript app faster — by you or with an AI. React pages and a Hono API in **one process**: drop files in `app/pages` and `app/api`; the client build fails if a page imports `getDb()`. Hono’s `fetch` is the server (Node, Bun, Workers). Anyone can use it — `npx degit pubflow/native/starter my-app`, or `bun add @pubflow/native`. Pubflow auth is optional.
 
 - [Why Native](./why.md)
 - [Create](./create.md)

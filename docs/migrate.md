@@ -1,6 +1,6 @@
 # Migrate from Next.js or TanStack Start
 
-Native is not a drop-in compiler for RSC or TanStack Start server functions.
+Switch for the folder map and the client guard (pages cannot import `getDb()`), not for a thinner Worker. Native is not a drop-in compiler for RSC or TanStack Start server functions.
 
 ## From Next (`next-flowfull-client`)
 
@@ -12,9 +12,9 @@ Native is not a drop-in compiler for RSC or TanStack Start server functions.
 
 ## From TanStack Start (`react-flowfull-client`)
 
-1. Keep TanStack Router components; drop `@tanstack/react-start` and Nitro.
+1. Keep TanStack Router components; drop `@tanstack/react-start` and `tanstackStart()`.
 2. Replace `createFileRoute` file routes with default-export pages under `app/pages` (Native generates the route tree).
 3. Move server functions to `app/actions` (POST JSON) or Hono `app/api`.
-4. Point Vite at `native()` instead of `tanstackStart()` + `nitro()`.
+4. Point Vite at `native()` instead of `tanstackStart()` (and the Cloudflare Vite plugin if you used it).
 
 Auth stays `@pubflow/react`. Do not invent SSR cookie sessions to “replace” Next cookies.

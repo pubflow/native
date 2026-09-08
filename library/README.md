@@ -1,6 +1,6 @@
 # @pubflow/native
 
-React pages + Hono API in one process. Hono’s `fetch` is the server (Node, Bun, Workers). Not a new category: Hono + TanStack Router + Vite. Any TypeScript app can use it; Pubflow auth is optional.
+Ship a secure full-stack TypeScript app faster — by you or with an AI. Pages and a Hono API as folders; secrets off the client. Hono’s `fetch` is the server (Node, Bun, Workers). Any TypeScript app can use it; Pubflow auth is optional.
 
 ```bash
 bun add @pubflow/native @tanstack/react-router hono react react-dom

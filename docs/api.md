@@ -1,5 +1,7 @@
 # API
 
+A Hono file in `app/api` is a route. Secrets and queries live here, not in pages — so a human or an agent cannot leak `DATABASE_URL` into the client bundle.
+
 Each `app/api/**/*.ts` file is a real Hono app. Native mounts `export default` at `/api/<path>`. You write the verbs (`.get`, `.post`, …). A JSON export or `export async function GET` does not mount.
 
 ```ts

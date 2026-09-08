@@ -6,7 +6,7 @@ All notable changes to `@pubflow/native` are documented here. Breaking changes b
 
 - Client build fails if a page imports `getDb()` or `app/api` (guided `[pubflow-native]` error).
 - GitHub CI: unit tests, typecheck, `wrangler deploy --dry-run` size budget.
-- Docs: Native is Hono + TanStack Router + Vite, not a new framework category. Hyperdrive stays opt-in.
+- Docs: Native is for shipping a secure full-stack app faster (humans and AI); folders keep secrets off the client. Hyperdrive stays opt-in.
 
 ## 1.0.0
 

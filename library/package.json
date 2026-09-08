@@ -1,7 +1,7 @@
 {
   "name": "@pubflow/native",
   "version": "1.0.1",
-  "description": "React pages and a Hono fetch API in one process. Node, Bun, or Cloudflare Workers. Not locked to Pubflow apps.",
+  "description": "Ship a secure full-stack TypeScript app faster. Pages and a Hono API as folders. Node, Bun, or Cloudflare Workers.",
   "type": "module",
   "license": "MIT",
   "repository": {

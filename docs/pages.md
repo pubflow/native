@@ -1,6 +1,6 @@
 # Pages
 
-Files under `app/pages` become TanStack Router routes. You export a React component. You do not write `createFileRoute`.
+Put a component in `app/pages` and it is a route. You export a React component. You do not write `createFileRoute` — the fast path for you and for an AI filling the mold.
 
 A folder is a URL segment. `index.tsx` is that folder’s page. A sibling file is another segment.
 

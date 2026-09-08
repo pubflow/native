@@ -1,5 +1,7 @@
 # Create
 
+The shortest path to a running full-stack app: clone a starter, then drop files in `app/pages` and `app/api`.
+
 Default app: **[starter/](https://github.com/pubflow/native/tree/master/starter)** — not the whole `pubflow/native` repo.
 
 ```bash

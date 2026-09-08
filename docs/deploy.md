@@ -1,6 +1,6 @@
 # Deploy
 
-Cloudflare is the isolate path. Node, Bun, and Docker are the process path. There is no OpenNext and no Nitro. One `vite build && vite build --ssr` emits every entry; pick the file your host runs.
+One `vite build && vite build --ssr` emits every entry; pick the file your host runs. Cloudflare is the isolate path. Node, Bun, and Docker are the process path.
 
 | Target | Entrypoint | Commands | Notes |
 | --- | --- | --- | --- |

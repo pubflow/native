@@ -1,10 +1,10 @@
 # Pubflow Native
 
-React pages and a Hono API in one process. The server is Hono’s `fetch` — Node, Bun, or a Cloudflare Worker, with no OpenNext and no Nitro. One repo, one `dev`, one deploy.
+Native is for shipping a **secure full-stack TypeScript app faster** — by you or with an AI. Pages and a Hono API are folders; secrets stay off the client; one process to run and deploy.
 
-Native is not a new category. It is Hono + TanStack Router + a Vite plugin, with folders that keep secrets off the page: `app/pages` is UI; `app/api` and `app/actions` hold queries and `DATABASE_URL`. The **client build fails** if a page imports `getDb()`. The browser only sees `PUBFLOW_PUBLIC_*` / `VITE_*`.
+The server is Hono’s `fetch` — Node, Bun, or a Cloudflare Worker. It is Hono + TanStack Router + a Vite plugin, not a new category: `app/pages` is UI; `app/api` and `app/actions` hold queries and `DATABASE_URL`. The **client build fails** if a page imports `getDb()`. The browser only sees `PUBFLOW_PUBLIC_*` / `VITE_*`.
 
-Anyone can use it. It is **not** locked to Pubflow products. Login via [Flowless](https://www.pubflow.com/products/flowless) is optional — skip it and Native is still React + Hono. Why this exists (and when to use Next instead): [Why Native](docs/why.md). Starters get you running; [Backend](docs/backend.md) is how the API grows (`app/lib`, `v1`/`v2`, `app/server.ts`).
+Anyone can use it. It is **not** locked to Pubflow products. Login via [Flowless](https://www.pubflow.com/products/flowless) is optional — skip it and Native is still React + Hono. Why this exists (and when to use Next or Start instead): [Why Native](docs/why.md). Starters get you running; [Backend](docs/backend.md) is how the API grows (`app/lib`, `v1`/`v2`, `app/server.ts`).
 
 Package: [`@pubflow/native`](https://www.npmjs.com/package/@pubflow/native)
 
@@ -149,8 +149,9 @@ See [`examples/`](examples/) — Minimal and Custom Hono are cloneable apps; Clo
 
 ## What it is for
 
+- Ship a secure full-stack app faster — you or an AI filling `app/pages` and `app/api`
 - UI and API in one TypeScript app — not two repos
-- Hono `fetch` on Node, Bun, and Workers (no adapter)
+- Hono `fetch` on Node, Bun, and Workers (one build; pick the entry)
 - Secrets on the server (`/api`, Actions); the client build fails if a page imports `getDb()`
 - Optional Flowless login: session id in, who + role out; `requireAuth` / `requireRole`
 - File routes you already know: `layout.tsx`, `index.tsx`, `[id].tsx`
