@@ -1,34 +1,29 @@
 # Pubflow Native
 
-Native is for shipping a **secure full-stack TypeScript app faster** — by you or with an AI. Pages and a Hono API are folders; secrets stay off the client; one process to run and deploy.
+**Full-stack TypeScript framework** — React pages and a Hono API in one process. One repo, one `dev`, one deploy.
 
-The server is Hono’s `fetch` — Node, Bun, or a Cloudflare Worker. It is Hono + TanStack Router + a Vite plugin, not a new category: `app/pages` is UI; `app/api` and `app/actions` hold queries and `DATABASE_URL`. The **client build fails** if a page imports `getDb()`. The browser only sees `PUBFLOW_PUBLIC_*` / `VITE_*`.
+UI (`app/pages`) and the server (`app/api`, `app/actions`) live together. A blog, a SaaS, an internal tool, or a new app — yours or built with an AI — without a frontend repo and a backend repo.
 
-Anyone can use it. It is **not** locked to Pubflow products. Login via [Flowless](https://www.pubflow.com/products/flowless) is optional — skip it and Native is still React + Hono. Why this exists (and when to use Next or Start instead): [Why Native](docs/why.md). Starters get you running; [Backend](docs/backend.md) is how the API grows (`app/lib`, `v1`/`v2`, `app/server.ts`).
+Secrets stay on the server. Pages cannot read `DATABASE_URL`. Queries and keys go in `app/api` or `app/actions`. The browser only sees `PUBFLOW_PUBLIC_*` / `VITE_*`.
+
+Login is optional. [Flowless](https://www.pubflow.com/products/flowless) is a trust layer: it knows **who** the user is and their **role** (admin, editor, …). The browser keeps a session id. Native asks Flowless if that session is valid, then you gate routes and Actions with `requireAuth` / `requireRole` — no extra auth stack, no secrets in the page. Skip Flowless and Native is still React + API.
+
+Anyone can use it. It is **not** locked to Pubflow products. Want the stack comparison (Next, TanStack Start, HonoX)? See [Why Native](docs/why.md).
 
 Package: [`@pubflow/native`](https://www.npmjs.com/package/@pubflow/native)
 
 ```
-app/pages/     UI (layout.tsx, index.tsx, [id].tsx → { id } props)
-app/api/       Hono apps → /api/...  (.get / .post; c.req.param('id'))
-app/lib/       domain code (not mounted)
+app/pages/     UI (layout.tsx, index.tsx, [id].tsx)
+app/api/       Hono apps → /api/...
 app/actions/   functions → POST /api/actions/<id>
 app/server.ts  optional — you own fetch
 index.html
 vite.config.ts plugins: [native()]
 ```
 
-The client build fails if a page imports `getDb()` or `app/api`. Put queries in `app/api` or `app/actions`. The browser only sees `PUBFLOW_PUBLIC_*` / `VITE_*`.
+Pages cannot read `DATABASE_URL`. Put queries and secrets in `app/api` or `app/actions`. The browser only sees `PUBFLOW_PUBLIC_*` / `VITE_*`.
 
 ## New app: clone [starter/](https://github.com/pubflow/native/tree/master/starter)
-
-Deploy on Cloudflare (clones that folder into your account):
-
-| App | Deploy |
-| --- | --- |
-| Default | <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/pubflow/native/tree/master/starter"><img src="https://cloud.notside.com/deploy-to-cloudflare.svg" alt="Deploy to Cloudflare" height="32" /></a> |
-| Minimal | <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/pubflow/native/tree/master/examples/minimal"><img src="https://cloud.notside.com/deploy-to-cloudflare.svg" alt="Deploy to Cloudflare" height="32" /></a> |
-| Custom Hono | <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/pubflow/native/tree/master/examples/custom-hono-server"><img src="https://cloud.notside.com/deploy-to-cloudflare.svg" alt="Deploy to Cloudflare" height="32" /></a> |
 
 That folder **is** the app. `git clone` on the repo URL would pull library, docs, and examples too. Clone **only** `starter/`:
 
@@ -50,7 +45,7 @@ bun run deploy:cf    # Cloudflare Worker
 
 The starter (Default) is a complete example: login/dashboard, Tailwind v4, and **shadcn already wired** (`components.json`, `cn()`, `@/` → `app/`, a few UI files). Add more with the official CLI — `npx shadcn@latest add dialog` — not `init -t vite`. **Delete or ignore auth** if you do not use Flowless — Native does not require it. `GET /` and your own `/api/*` routes work with no Pubflow services running.
 
-`pubflow create native` / `pubflow start native` copies `starter/`. `native-minimal` and `native-custom-hono` copy those example apps (also cloneable with degit). Cloudflare, auth, and shadcn are on Default — `examples/cloudflare-worker`, `examples/with-auth`, and `examples/shadcn` are notes, not templates. Minimal and Custom Hono ship Tailwind v4 (no shadcn); add components with `pubflow add shadcn` then `npx shadcn add`. Open `/items` there for list → `[id]` → `/api/items`.
+`pubflow create native` / `pubflow start native` copies `starter/`. `native-minimal` and `native-custom-hono` copy those example apps (also cloneable with degit). Cloudflare, auth, and shadcn are on Default — `examples/cloudflare-worker`, `examples/with-auth`, and `examples/shadcn` are notes, not templates. Minimal/Custom Hono have no Tailwind; run `pubflow add shadcn` then `npx shadcn add`.
 
 Install the CLI ([`pubflow`](https://www.npmjs.com/package/pubflow) on npm — bins `pubflow` and `pbfl`). Pick the manager you already use:
 
@@ -73,10 +68,10 @@ bunx pubflow start native my-app
 
 ## Existing project
 
-`bun add` the library. You do not need the rest of Pubflow.
+`npm install or bun add` the library. You do not need the rest of Pubflow.
 
 ```bash
-bun add @pubflow/native@^1.0.0 @tanstack/react-router hono react react-dom
+bun add @pubflow/native@latest @tanstack/react-router hono react react-dom
 bun add -d vite
 ```
 
@@ -108,11 +103,6 @@ export default function Layout({ children }: { children: ReactNode }) {
 export default function HomePage() {
   return <h1>Hello</h1>
 }
-
-// app/pages/items/[id].tsx — id is a prop
-export default function ItemPage({ id }: { id: string }) {
-  return <p>{id}</p>
-}
 ```
 
 ```ts
@@ -120,7 +110,6 @@ export default function ItemPage({ id }: { id: string }) {
 import { Hono } from 'hono'
 const hello = new Hono()
 hello.get('/', (c) => c.json({ hello: true }))
-hello.get('/:id', (c) => c.json({ id: c.req.param('id') }))
 export default hello
 ```
 
@@ -149,11 +138,9 @@ See [`examples/`](examples/) — Minimal and Custom Hono are cloneable apps; Clo
 
 ## What it is for
 
-- Ship a secure full-stack app faster — you or an AI filling `app/pages` and `app/api`
 - UI and API in one TypeScript app — not two repos
-- Hono `fetch` on Node, Bun, and Workers (one build; pick the entry)
-- Secrets on the server (`/api`, Actions); the client build fails if a page imports `getDb()`
-- Optional Flowless login: session id in, who + role out; `requireAuth` / `requireRole`
+- Secrets and database access on the server (`/api`, Actions); pages cannot read `DATABASE_URL`
+- Flowless as a trust layer when you want login: session id in, who + role out; `requireAuth` / `requireRole` to limit what they can do
 - File routes you already know: `layout.tsx`, `index.tsx`, `[id].tsx`
 
 Native is web. For mobile use `pubflow create react-native` / Expo. For a non-TypeScript API use Go, Python, or Rust. For an MPA / islands app, HonoX. Details: [Why Native](docs/why.md).
@@ -162,26 +149,21 @@ Native is web. For mobile use `pubflow create react-native` / Expo. For a non-Ty
 
 | File | Route |
 | --- | --- |
-| `app/pages/layout.tsx` | Nested layout (`children`; path params as extra props) |
+| `app/pages/layout.tsx` | Nested layout (`children`) |
 | `app/pages/index.tsx` | `/` |
-| `app/pages/about.tsx` | `/about` |
-| `app/pages/products/index.tsx` | `/products` (same as `products.tsx` — folder wins if both exist) |
-| `app/pages/items/[id].tsx` | `/items/$id` — page receives `{ id }` |
-| `app/api/users.ts` | `/api/users` (write `.get` / `.post`) |
-| `app/api/products/index.ts` | `/api/products` |
-| `app/api/v1/products.ts` | `/api/v1/products` |
+| `app/pages/dashboard/index.tsx` | `/dashboard` |
+| `app/pages/[id].tsx` | `/$id` |
+| `app/api/users.ts` | `/api/users` |
 | `app/api/_middleware.ts` | Middleware for `/api/*` |
 | `app/actions/posts/createPost.ts` | `POST /api/actions/posts.createPost` |
 
-Default export is the page, layout, or Hono app. You do not write `createFileRoute`. Optional: `usePathParams()` from `@pubflow/native` or `useParams` from TanStack. Generated files live in `.pubflow/generated/` (gitignored).
-
-More: [Pages](docs/pages.md), [API](docs/api.md), [Backend](docs/backend.md), [Upgrade](docs/upgrade.md).
+Default export is the page, layout, or Hono app. You do not write `createFileRoute`. Generated files live in `.pubflow/generated/` (gitignored).
 
 Optional env: browser `PUBFLOW_PUBLIC_*` or `VITE_*` (`publicEnv()`). Server uses normal names (`DATABASE_URL`, …). `pubflow.config.ts` is metadata only in v0.1.
 
 ## Optional Pubflow extras
 
-[Flowless](https://github.com/pubflow) is the trust layer (who + role). Native is the app mold, not a second auth stack. Gate `/api` and Actions with `requireAuth` / `requireRole`. Skip Flowless if you do not need login. See [Auth](docs/auth.md) and [Why Native](docs/why.md).
+[Flowless](https://github.com/pubflow) is the trust layer: who the user is, their role, and a session id Native can check. Gate `/api` and Actions with `requireAuth` / `requireRole`. Skip it if you do not need login — Native is still React + Hono. See [Auth](docs/auth.md) and [Why Native](docs/why.md).
 
 ## This repository
 
@@ -192,6 +174,6 @@ Optional env: browser `PUBFLOW_PUBLIC_*` or `VITE_*` (`publicEnv()`). Server use
 | [`examples/minimal`](examples/minimal), [`examples/custom-hono-server`](examples/custom-hono-server) | other cloneable Native apps |
 | `examples/cloudflare-worker`, `examples/with-auth`, `examples/shadcn`, `docs/` | notes / docs — not templates |
 
-Root `package.json` is private. After a library publish: bump `"@pubflow/native"` in the three templates (see [Upgrade](docs/upgrade.md)).
+Root `package.json` is private. After a library fix: publish npm, **then** bump the pin in `starter/package.json`.
 
-More: [docs/](docs/), [CHANGELOG](CHANGELOG.md)
+More: [docs/](docs/)
