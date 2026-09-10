@@ -15,7 +15,18 @@
     "password": "Contraseña",
     "error": "No se pudo entrar. Revisa la URL de Flowless y las credenciales.",
     "noAccount": "¿Sin cuenta?",
-    "forgot": "¿Olvidaste la contraseña?"
+    "forgot": "¿Olvidaste la contraseña?",
+    "otpTitle": "Revisa tu correo",
+    "otpSubtitle": "Escribe el código que enviamos. Flowless ya lo mandó al iniciar sesión.",
+    "otpRequired": "Escribe el código de verificación.",
+    "codeLabel": "Código ({{method}})",
+    "method": "Método de verificación",
+    "verify": "Verificar código",
+    "resend": "Reenviar código",
+    "invalidCode": "El código no es válido.",
+    "verifyFailed": "No se pudo verificar el código.",
+    "resendFailed": "No se pudo reenviar el código.",
+    "noMethod": "No hay un método de verificación disponible."
   },
   "passwordReset": {
     "link": "¿Olvidaste la contraseña?",
