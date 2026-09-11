@@ -33,22 +33,39 @@ export type Branding = {
   primary: string
 }
 
+export type MailTemplateMap = Record<string, string>
+
+export type SendMailOptions = {
+  env?: NodeJS.ProcessEnv
+  root?: string
+  /** Bundled `lang/template` HTML (Workers have no `app/mail` on disk). */
+  templates?: MailTemplateMap
+}
+
 function env(name: string, fallback = '', source: NodeJS.ProcessEnv = process.env): string {
-  return (source[name] || '').trim() || fallback
+  const value = (source as Record<string, unknown>)[name]
+  return (typeof value === 'string' ? value : '').trim() || fallback
+}
+
+function isCloudflareWorker() {
+  return typeof navigator !== 'undefined' && navigator.userAgent === 'Cloudflare-Workers'
 }
 
 export function detectMailTransport(source: NodeJS.ProcessEnv = process.env): MailTransport {
-  if (source.MOCK_EMAIL === 'true') return { kind: 'mock' }
-  const smtpUrl = env('SMTP_URL', '', source)
-  if (smtpUrl) return { kind: 'smtp-url', url: smtpUrl }
-  const host = env('SMTP_HOST', '', source)
-  const user = env('SMTP_USERNAME', '', source) || env('SMTP_USER', '', source)
-  const pass = env('SMTP_PASSWORD', '', source) || env('SMTP_PASS', '', source)
-  if (host && user) {
-    const port = Number(env('SMTP_PORT', '587', source)) || 587
-    return { kind: 'smtp-host', host, port, user, pass, secure: port === 465 }
-  }
+  if (env('MOCK_EMAIL', '', source) === 'true') return { kind: 'mock' }
   const zepto = env('ZEPTOMAIL_API_KEY', '', source)
+  const smtpUsable = !isCloudflareWorker()
+  if (smtpUsable) {
+    const smtpUrl = env('SMTP_URL', '', source)
+    if (smtpUrl) return { kind: 'smtp-url', url: smtpUrl }
+    const host = env('SMTP_HOST', '', source)
+    const user = env('SMTP_USERNAME', '', source) || env('SMTP_USER', '', source)
+    const pass = env('SMTP_PASSWORD', '', source) || env('SMTP_PASS', '', source)
+    if (host && user) {
+      const port = Number(env('SMTP_PORT', '587', source)) || 587
+      return { kind: 'smtp-host', host, port, user, pass, secure: port === 465 }
+    }
+  }
   if (zepto) return { kind: 'zepto', apiKey: zepto }
   return { kind: 'off' }
 }
@@ -95,14 +112,25 @@ export function loadMailTemplate(
   template: string,
   lang?: string,
   root = process.cwd(),
+  templates?: MailTemplateMap,
 ): { html: string; lang: string } | null {
   const resolved = resolveMailLang(lang)
-  const dirs = [path.join(root, 'app', 'mail', resolved), path.join(root, 'app', 'mail', 'en')]
-  for (const dir of dirs) {
-    const file = path.join(dir, `${template}.html`)
-    if (fs.existsSync(file)) {
-      return { html: fs.readFileSync(file, 'utf8'), lang: dir.endsWith(`${path.sep}en`) && resolved !== 'en' ? 'en' : resolved }
+  if (templates) {
+    const match = templates[`${resolved}/${template}`]
+    if (match) return { html: match, lang: resolved }
+    const en = templates[`en/${template}`]
+    if (en) return { html: en, lang: 'en' }
+  }
+  try {
+    const dirs = [path.join(root, 'app', 'mail', resolved), path.join(root, 'app', 'mail', 'en')]
+    for (const dir of dirs) {
+      const file = path.join(dir, `${template}.html`)
+      if (fs.existsSync(file)) {
+        return { html: fs.readFileSync(file, 'utf8'), lang: dir.endsWith(`${path.sep}en`) && resolved !== 'en' ? 'en' : resolved }
+      }
     }
+  } catch {
+    return null
   }
   return null
 }
@@ -174,10 +202,7 @@ async function sendZepto(apiKey: string, from: string, fromName: string, replyTo
 
 export type SendMailResult = { sent: boolean; skipped?: 'off' | 'mock' }
 
-export async function sendMail(
-  input: MailMessage,
-  options: { env?: NodeJS.ProcessEnv; root?: string } = {},
-): Promise<SendMailResult> {
+export async function sendMail(input: MailMessage, options: SendMailOptions = {}): Promise<SendMailResult> {
   const source = options.env || process.env
   const transport = detectMailTransport(source)
   if (transport.kind === 'off') return { sent: false, skipped: 'off' }
@@ -186,10 +211,13 @@ export async function sendMail(
   let html = input.html
   let subject = input.subject
   if (input.template) {
-    const loaded = loadMailTemplate(input.template, input.lang, options.root)
+    const loaded = loadMailTemplate(input.template, input.lang, options.root, options.templates)
     if (loaded) {
       html = interpolate(loaded.html, { ...brandingVars(brand), ...(input.vars || {}) })
       if (!input.subject) subject = subjectFromHtml(loaded.html, input.template)
+    } else if (html && input.vars) {
+      html = interpolate(html, { ...brandingVars(brand), ...input.vars })
+      if (!input.subject) subject = subjectFromHtml(html, input.template)
     }
   } else if (input.vars) {
     html = interpolate(html, { ...brandingVars(brand), ...input.vars })
@@ -214,7 +242,7 @@ export async function sendMail(
 
 export async function sendLocalizedEmail(
   input: Omit<MailMessage, 'html' | 'subject'> & { template: string; subject?: string; html?: string },
-  options?: { env?: NodeJS.ProcessEnv; root?: string },
+  options?: SendMailOptions,
 ): Promise<SendMailResult> {
   return sendMail(
     {

@@ -15,6 +15,15 @@ describe('mail detect', () => {
     expect(detectMailTransport({ MOCK_EMAIL: 'true', SMTP_URL: 'smtp://x' }).kind).toBe('mock')
   })
 
+  it('loads bundled templates without disk', () => {
+    const loaded = loadMailTemplate('welcome', 'es', '/no-app', {
+      'es/welcome': '<p>Hola {{name}}</p>',
+      'en/welcome': '<p>Hi {{name}}</p>',
+    })
+    expect(loaded?.html).toBe('<p>Hola {{name}}</p>')
+    expect(loaded?.lang).toBe('es')
+  })
+
   it('reads branding only when set', () => {
     expect(readBranding({}).name).toBe('')
     expect(readBranding({ BRAND_NAME: 'Acme', MAIL_FROM: 'a@acme.test' }).from).toBe('a@acme.test')
