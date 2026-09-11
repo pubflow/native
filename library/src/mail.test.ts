@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import { detectMailTransport, interpolate, loadMailTemplate, readBranding, sendMail } from './mail.ts'
+import { detectMailTransport, interpolate, loadMailTemplate, normalizeZeptoApiKey, readBranding, sendMail } from './mail.ts'
 
 describe('mail detect', () => {
   it('picks SMTP_URL, then host+user, then Zepto, else off', () => {
@@ -13,6 +13,11 @@ describe('mail detect', () => {
     expect(detectMailTransport({ ZEPTOMAIL_API_KEY: 'z' }).kind).toBe('zepto')
     expect(detectMailTransport({}).kind).toBe('off')
     expect(detectMailTransport({ MOCK_EMAIL: 'true', SMTP_URL: 'smtp://x' }).kind).toBe('mock')
+  })
+
+  it('strips a duplicated Zepto authorization prefix', () => {
+    expect(normalizeZeptoApiKey('Zoho-enczapikey abc')).toBe('abc')
+    expect(normalizeZeptoApiKey('abc')).toBe('abc')
   })
 
   it('loads bundled templates without disk', () => {

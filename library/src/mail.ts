@@ -178,24 +178,70 @@ async function sendSmtp(transport: MailTransport, from: string, fromName: string
   })
 }
 
-async function sendZepto(apiKey: string, from: string, fromName: string, replyTo: string, message: MailMessage) {
-  const response = await fetch('https://api.zeptomail.com/v1.1/email', {
+function zeptoEndpoint(source: NodeJS.ProcessEnv): string {
+  const raw = env('ZEPTOMAIL_API_URL', '', source).replace(/\/$/, '')
+  if (!raw) return 'https://api.zeptomail.com/v1.1/email'
+  return raw.endsWith('/v1.1/email') ? raw : `${raw}/v1.1/email`
+}
+
+export function normalizeZeptoApiKey(apiKey: string): string {
+  return apiKey.replace(/^Zoho-enczapikey\s+/i, '').trim()
+}
+
+function senderHost(from: string): string {
+  const at = from.lastIndexOf('@')
+  return at >= 0 ? from.slice(at + 1) : 'none'
+}
+
+async function sendZepto(
+  apiKey: string,
+  from: string,
+  fromName: string,
+  replyTo: string,
+  message: MailMessage,
+  source: NodeJS.ProcessEnv,
+) {
+  const html = (message.html || '').trim()
+  const text = (message.text || '').trim()
+  if (!html && !text) throw new Error('ZeptoMail: htmlbody or textbody is required')
+  const endpoint = zeptoEndpoint(source)
+  let host = 'api.zeptomail.com'
+  try {
+    host = new URL(endpoint).host
+  } catch {
+    throw new Error('ZEPTOMAIL_API_URL is not a valid URL')
+  }
+  const fromObj: { address: string; name?: string } = { address: from }
+  if (fromName.trim()) fromObj.name = fromName.trim()
+  const payload: Record<string, unknown> = {
+    from: fromObj,
+    to: [{ email_address: { address: message.to } }],
+    subject: message.subject,
+  }
+  if (html) payload.htmlbody = html
+  if (text) payload.textbody = text
+  if (replyTo.trim()) payload.reply_to = [{ address: replyTo.trim() }]
+
+  console.info('zepto host=' + host, 'fromHost=' + senderHost(from), 'htmlLength=' + html.length)
+
+  const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
-      Authorization: `Zoho-enczapikey ${apiKey}`,
+      Authorization: `Zoho-enczapikey ${normalizeZeptoApiKey(apiKey)}`,
       'Content-Type': 'application/json',
+      Accept: 'application/json',
     },
-    body: JSON.stringify({
-      from: { address: from, name: fromName || undefined },
-      to: [{ email_address: { address: message.to } }],
-      subject: message.subject,
-      htmlbody: message.html,
-      textbody: message.text,
-      reply_to: replyTo ? [{ address: replyTo }] : undefined,
-    }),
+    body: JSON.stringify(payload),
   })
   if (!response.ok) {
     const body = await response.text().catch(() => '')
+    console.error(
+      'zepto host=' + host,
+      'fromHost=' + senderHost(from),
+      'htmlLength=' + html.length,
+      'status=' + response.status,
+      'body=' + (body.slice(0, 200) || '(empty)'),
+    )
     throw new Error(`ZeptoMail failed (${response.status}): ${body.slice(0, 200)}`)
   }
 }
@@ -233,7 +279,7 @@ export async function sendMail(input: MailMessage, options: SendMailOptions = {}
   if (!from) throw new Error('MAIL_FROM or BRAND_EMAIL is required to send mail')
 
   if (transport.kind === 'zepto') {
-    await sendZepto(transport.apiKey, from, brand.fromName, brand.replyTo, message)
+    await sendZepto(transport.apiKey, from, brand.fromName, brand.replyTo, message, source)
     return { sent: true }
   }
   await sendSmtp(transport, from, brand.fromName, brand.replyTo, message)
