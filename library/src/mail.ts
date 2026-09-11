@@ -113,9 +113,17 @@ function subjectFromHtml(html: string, fallback: string): string {
 }
 
 async function sendSmtp(transport: MailTransport, from: string, fromName: string, replyTo: string, message: MailMessage) {
-  const nodemailer = (await import(/* @vite-ignore */ 'nodemailer')) as {
-    createTransport: (opts: unknown) => { sendMail: (opts: unknown) => Promise<unknown> }
-    default?: { createTransport: (opts: unknown) => { sendMail: (opts: unknown) => Promise<unknown> } }
+  type Smtp = { sendMail: (opts: unknown) => Promise<unknown> }
+  type NodemailerApi = {
+    createTransport?: (opts: unknown) => Smtp
+    default?: { createTransport?: (opts: unknown) => Smtp }
+  }
+  const spec = 'nodemailer'
+  let nodemailer: NodemailerApi
+  try {
+    nodemailer = (await import(spec)) as NodemailerApi
+  } catch {
+    throw new Error('Install nodemailer to send SMTP mail')
   }
   const createTransport = nodemailer.createTransport || nodemailer.default?.createTransport
   if (!createTransport) throw new Error('Install nodemailer to send SMTP mail')

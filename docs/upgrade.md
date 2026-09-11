@@ -2,6 +2,12 @@
 
 `@pubflow/native` is an npm package. Cloning a starter copies that app’s `package.json`. Publishing a new library version does **not** rewrite apps you already created.
 
+## 1.0.2
+
+Worker SSR bundles Turso (`kysely` + `@libsql/client/web`); `pg` / `mysql2` stay Node-only. Optional `nodemailer` is loaded without requiring `@types/nodemailer` in apps.
+
+`bun add @pubflow/native@1.0.2` (or `bun update` on `^1.0.0`).
+
 ## 1.0.0
 
 Templates now use `"@pubflow/native": "^1.0.0"` (`>=1.0.0 <2.0.0`). Apps still on `^0.1.6` **do not** jump to 1.0 on `bun install`. Opt in:

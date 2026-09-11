@@ -60,7 +60,8 @@ type RedisLike = {
 
 async function connectRedis(url: string): Promise<RedisLike> {
   try {
-    const ioredis = (await import(/* @vite-ignore */ 'ioredis')) as {
+    const ioredisId = 'ioredis'
+    const ioredis = (await import(ioredisId)) as {
       default?: new (url: string) => RedisLike
       Redis?: new (url: string) => RedisLike
     }
@@ -68,7 +69,8 @@ async function connectRedis(url: string): Promise<RedisLike> {
     if (!Redis) throw new Error('no ioredis')
     return new Redis(url)
   } catch {
-    const redis = (await import(/* @vite-ignore */ 'redis')) as {
+    const redisId = 'redis'
+    const redis = (await import(redisId)) as {
       createClient: (opts: { url: string }) => RedisLike & { connect: () => Promise<void> }
     }
     const client = redis.createClient({ url })
