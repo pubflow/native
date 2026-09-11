@@ -17,7 +17,7 @@
     "@libsql/client": "^0.15.0",
     "@libsql/kysely-libsql": "^0.4.1",
     "@pubflow/core": "0.5.0",
-    "@pubflow/native": "^1.0.0",
+    "@pubflow/native": "workspace:*",
     "@pubflow/react": "0.5.0",
     "@tanstack/react-router": "^1.131.0",
     "class-variance-authority": "^0.7.1",

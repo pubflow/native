@@ -14,6 +14,7 @@
   "observability": {
     "enabled": true
   },
+  "keep_vars": true,
   // Postgres/MySQL on Workers: create Hyperdrive (dashboard or wrangler), then paste the id:
   // "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "<id>" }],
   "alias": {

@@ -14,12 +14,13 @@
   "observability": {
     "enabled": true
   },
+  "keep_vars": true,
   // Postgres/MySQL on Workers: create Hyperdrive (dashboard or wrangler), then paste the id:
   // "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "<id>" }],
     "alias": {
     "redis": "./optional-node-stub.js",
     "ioredis": "./optional-node-stub.js",
     "nodemailer": "./optional-node-stub.js",
-    "@libsql/client": "./node_modules/@libsql/client/lib-esm/web.js"
+    "@libsql/client": "./libsql-web-shim.js"
   }
 }
