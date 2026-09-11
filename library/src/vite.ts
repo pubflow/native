@@ -33,11 +33,8 @@ const OPTIONAL_SSR_EXTERNALS = [
   'ioredis',
   'redis',
   'nodemailer',
-  'kysely',
   'pg',
   'mysql2',
-  '@libsql/client',
-  '@libsql/kysely-libsql',
 ]
 
 function resolveEntry(libraryRoot: string, name: string): string {

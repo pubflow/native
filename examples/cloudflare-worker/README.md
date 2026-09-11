@@ -18,5 +18,5 @@ One Worker is pages + API. `FLOWLESS_URL` and `BRIDGE_SECRET` (or `BRIDGE_VALIDA
 Database:
 
 - **No database** — clone / Deploy to Cloudflare. Do not edit `wrangler.jsonc`.
-- **Turso** — `wrangler secret put DATABASE_URL` with `libsql://...?authToken=`. HTTP. No Hyperdrive.
+- **Turso** — Worker runtime secret `DATABASE_URL` (`libsql://…`). HTTP (`@libsql/client/web`). No Hyperdrive. Not a git Builds variable.
 - **Postgres / MySQL** — extra step: create Hyperdrive, uncomment the binding. See [Hyperdrive](../../docs/hyperdrive.md).

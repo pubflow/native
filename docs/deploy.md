@@ -16,7 +16,7 @@ One `vite build && vite build --ssr` emits every entry; pick the file your host 
 - `assets.directory`: `dist/client`
 - `run_worker_first`: true so HTML is SSR, not a static `index.html` SPA fallback
 - No database: clone / Deploy to Cloudflare. Do not edit `wrangler.jsonc`.
-- Turso: `wrangler secret put DATABASE_URL` with `libsql://...?authToken=`. No Hyperdrive.
+- Turso: Worker **runtime** secret `DATABASE_URL` (`libsql://...?authToken=`). HTTP. No Hyperdrive. Do not put this in Workers Builds / git CI.
 - Postgres / MySQL on Workers: create Hyperdrive, then uncomment the binding — [Hyperdrive](./hyperdrive.md). Not a TCP `pg` pool in the isolate. Node / Bun still use `DATABASE_URL` only.
 - Vars (same values as the client; not secrets): `FLOWLESS_URL`, `BRIDGE_SECRET` or `BRIDGE_VALIDATION_SECRET`
 

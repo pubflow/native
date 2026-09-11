@@ -12,11 +12,11 @@ One `DATABASE_URL`. Empty → do not call `getDb()` (the Default starter still b
 | `mysql://` | mysql |
 | `libsql://` / `file:` | turso / libsql |
 
-`DATABASE_PROVIDER=` overrides detection (`postgres`, `mysql`, `neon`, `planetscale`, `libsql`).
+`DATABASE_PROVIDER=` overrides detection at **runtime** (`postgres`, `mysql`, `neon`, `planetscale`, `libsql` / `turso`). Put it on the Worker (Settings → Variables and Secrets) if you need it — not in Workers Builds / git CI. The URL already selects the driver (`libsql://` → Turso). Do not add a build-time `DATABASE_TYPE`.
 
 Turso: put `authToken` (or `token` / `auth_token`) on the URL query. Native strips it before connecting. `TURSO_AUTH_TOKEN` is a code fallback — keep it out of `.env.example`.
 
-Needs optional peers: `kysely` plus `pg`, `mysql2`, or `@libsql/kysely-libsql`. The Default starter lists them. Minimal does not.
+The Default starter installs `kysely`, `@libsql/client`, `@libsql/kysely-libsql`, `pg`, and `mysql2`. Minimal does not. On a **Cloudflare Worker**, Native bundles Turso HTTP (`kysely` + `@libsql/client/web`). `pg` / `mysql2` stay Node-only unless you add Hyperdrive. Do not ship the native `libsql` napi binary to Workerd.
 
 Default starter re-exports from `app/lib/db.ts`. There is **no** local users table — identity stays in Flowless.
 
@@ -36,7 +36,7 @@ A Worker isolate is not a long-lived Node process. Do **not** open a big TCP poo
 | Target | How |
 | --- | --- |
 | Nothing | Clone / Deploy to Cloudflare. Do not edit `wrangler.jsonc`. |
-| Turso / LibSQL | `wrangler secret put DATABASE_URL` with `libsql://...?authToken=`. HTTP. **No Hyperdrive.** |
+| Turso / LibSQL (default on Workers) | Runtime secret `DATABASE_URL` (`libsql://…`) plus `TURSO_AUTH_TOKEN` if the token is not on the URL. HTTP via `@libsql/client/web`. **No Hyperdrive.** Not a git Builds variable. |
 | Postgres or MySQL (RDS, Cloud SQL, Neon, PlanetScale, a VPS, …) | **Hyperdrive** (opt-in) — Cloudflare pools at the edge. Native uses `pg` / `mysql2` with `max: 1` / `connectionLimit: 1`. See [Hyperdrive](./hyperdrive.md). |
 | D1 | Not wired through `getDb()` yet. |
 
