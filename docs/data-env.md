@@ -8,6 +8,6 @@ Two data modes:
 Rules:
 
 - Client env is a whitelist: `PUBFLOW_PUBLIC_*` or `VITE_*`. `publicEnv('FLOWLESS_URL')` / `publicEnv('BRIDGE_SECRET')` in `app/lib/pubflow-config.ts` read both. Same idea as create-flowfull-client `VITE_API_BASE_URL` / `VITE_BRIDGE_SECRET` — public config, not secrets. Flowless core validates sessions.
-- Server uses the **same** Flowless URL and Bridge string without a prefix (`FLOWLESS_URL`, `BRIDGE_SECRET` or `BRIDGE_VALIDATION_SECRET`) so Vite never inlines them next to `DATABASE_URL`. `requireAuth()` POSTs `/auth/bridge/validate`.
+- Server `requireAuth()` uses the same strings: unprefixed `FLOWLESS_URL` / `BRIDGE_SECRET` if set, otherwise `PUBFLOW_PUBLIC_*` / `VITE_*`. Unprefixed names are an optional override so Vite never inlines them next to `DATABASE_URL`. `BRIDGE_VALIDATION_SECRET` still wins. `requireAuth()` POSTs `/auth/bridge/validate`.
 - `DATABASE_URL` is the only database secret. Never `VITE_DATABASE_URL` or `PUBFLOW_PUBLIC_DATABASE_URL`. Hosts (Neon, Coolify, Wrangler) already expect that name. Put the Neon/PlanetScale/Turso string in `DATABASE_URL` — see [Env](./env.md) and [Database](./db.md). Postgres/MySQL on Workers: [Hyperdrive](./hyperdrive.md). The client build fails if a page imports `getDb()`.
 

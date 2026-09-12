@@ -47,7 +47,7 @@ PUBFLOW_PUBLIC_FLOWLESS_URL=http://localhost:8787
 PUBFLOW_PUBLIC_BRIDGE_SECRET=
 ```
 
-Server uses the **same** Flowless URL and Bridge string, unprefixed so Vite never mixes them with `DATABASE_URL`:
+`requireAuth()` uses those public copies when unprefixed `FLOWLESS_URL` / `BRIDGE_SECRET` are missing. Set the unprefixed names only to override at runtime:
 
 ```
 FLOWLESS_URL=http://localhost:8787

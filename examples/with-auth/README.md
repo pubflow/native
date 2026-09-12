@@ -16,8 +16,6 @@ Or `pubflow create native my-app`.
 ```
 PUBFLOW_PUBLIC_FLOWLESS_URL=http://localhost:8787
 PUBFLOW_PUBLIC_BRIDGE_SECRET=<same string Flowless expects>
-FLOWLESS_URL=http://localhost:8787
-BRIDGE_SECRET=<same string>
 ```
 
-`BRIDGE_VALIDATION_SECRET` is an alias of `BRIDGE_SECRET`. `DATABASE_URL` is the only secret.
+Unprefixed `FLOWLESS_URL` / `BRIDGE_SECRET` are optional overrides. `BRIDGE_VALIDATION_SECRET` is an alias of `BRIDGE_SECRET`. `DATABASE_URL` is the only secret.

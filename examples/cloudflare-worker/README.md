@@ -13,7 +13,7 @@ bun run deploy:cf
 
 Or `pubflow create native my-app`.
 
-One Worker is pages + API. `FLOWLESS_URL` and `BRIDGE_SECRET` (or `BRIDGE_VALIDATION_SECRET`) are normal vars — the same public strings as `PUBFLOW_PUBLIC_FLOWLESS_URL` / `PUBFLOW_PUBLIC_BRIDGE_SECRET` on the client.
+One Worker is pages + API. `PUBFLOW_PUBLIC_FLOWLESS_URL` and `PUBFLOW_PUBLIC_BRIDGE_SECRET` are enough for client and `requireAuth()`. Unprefixed `FLOWLESS_URL` / `BRIDGE_SECRET` (or `BRIDGE_VALIDATION_SECRET`) are optional runtime overrides.
 
 Database:
 

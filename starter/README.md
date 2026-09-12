@@ -19,7 +19,7 @@ Pubflow / Flowless auth in this template is **optional**. Delete these if you ju
 - `app/components/auth-guard.tsx`
 - unwrap `PubflowProvider` in `app/components/providers.tsx`
 - drop `@pubflow/react` / `@pubflow/core` from `package.json`
-- keep `FLOWLESS_URL` / `BRIDGE_SECRET` out of `.env`
+- keep `DATABASE_URL` out of `.env` unless you use a database. Flowless URL + bridge string can stay as `PUBFLOW_PUBLIC_*` only.
 
 DB, cache, and mail in `@pubflow/native` do not depend on Flowless.
 

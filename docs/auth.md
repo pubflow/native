@@ -41,11 +41,9 @@ Pages: `AuthGuard` `allowedTypes` is UI only — **POST still needs server check
 ```
 PUBFLOW_PUBLIC_FLOWLESS_URL=http://localhost:8787
 PUBFLOW_PUBLIC_BRIDGE_SECRET=
-FLOWLESS_URL=http://localhost:8787
-BRIDGE_SECRET=
 ```
 
-`PUBFLOW_PUBLIC_*` / `VITE_*` go in the browser (`PubflowProvider` `baseUrl` + `X-Bridge-Secret`). The unprefixed names are the same strings for `requireAuth()`. `BRIDGE_VALIDATION_SECRET` is an alias of `BRIDGE_SECRET`. Header `X-Bridge-Secret` on `POST /auth/bridge/validate`.
+Unprefixed `FLOWLESS_URL` / `BRIDGE_SECRET` are optional — `requireAuth()` uses the public copies when they are missing. Set the unprefixed names to override at runtime (Workers) without rebuilding. `BRIDGE_VALIDATION_SECRET` still wins over `BRIDGE_SECRET`. Header `X-Bridge-Secret` on `POST /auth/bridge/validate`.
 
 After Flowless validates, Native may bind IP/User-Agent (`AUTH_VALIDATION_MODE`, default `STANDARD`). See [Security](./security.md). Forgot/reset in the Default starter call Flowless `/auth/password-reset/*`.
 

@@ -18,7 +18,7 @@ One `vite build && vite build --ssr` emits every entry; pick the file your host 
 - No database: clone / Deploy to Cloudflare. Do not edit `wrangler.jsonc`.
 - Turso: Worker **runtime** secret `DATABASE_URL` (`libsql://...?authToken=`). HTTP. No Hyperdrive. Do not put this in Workers Builds / git CI.
 - Postgres / MySQL on Workers: create Hyperdrive, then uncomment the binding — [Hyperdrive](./hyperdrive.md). Not a TCP `pg` pool in the isolate. Node / Bun still use `DATABASE_URL` only.
-- Vars (same values as the client; not secrets): `FLOWLESS_URL`, `BRIDGE_SECRET` or `BRIDGE_VALIDATION_SECRET`
+- Vars (public Flowless URL + bridge string): `PUBFLOW_PUBLIC_FLOWLESS_URL` and `PUBFLOW_PUBLIC_BRIDGE_SECRET` are enough. Unprefixed `FLOWLESS_URL` / `BRIDGE_SECRET` (or `BRIDGE_VALIDATION_SECRET`) are optional runtime overrides.
 - `"keep_vars": true` in the app `wrangler.jsonc`: dashboard plaintext Variables survive git/`wrangler deploy`. Secrets already persist. Workers Builds vars are not runtime.
 
 Coolify: Nixpacks (commit `nixpacks.toml` + `bun.lock`) or the Dockerfile. Railway: same Nixpacks file. Do not leave start as `node dist/server/node.js` on a Bun-only image.

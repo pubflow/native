@@ -12,7 +12,7 @@ export {
 } from './actions.ts'
 export type { ActionContext, ActionModule, ActionSession } from './actions.ts'
 export { generateNative } from './codegen.ts'
-export { publicEnv } from './env.ts'
+export { publicEnv, serverEnv } from './env.ts'
 export { getClientIp, corsFromEnv } from './http.ts'
 
 export { default as native } from './vite.ts'

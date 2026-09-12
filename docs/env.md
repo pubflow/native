@@ -11,9 +11,11 @@ Keep `.env.example` short. Copy it, fill what you use, ignore the rest. Native a
 - `APP_NAME`, `DEFAULT_THEME` (`system` / `light` / `dark`)
 - Optional: `DEFAULT_LANGUAGE` (locks one language, hides the toggle), `APP_LOGO`, `APP_LOGO_DARK`
 
-**Server (unprefixed — Vite never inlines these):**
+**Server** — `requireAuth()` reads the unprefixed name first, then the public/Vite copy of the same key. `PUBFLOW_PUBLIC_FLOWLESS_URL` / `PUBFLOW_PUBLIC_BRIDGE_SECRET` are enough. Unprefixed `FLOWLESS_URL` / `BRIDGE_SECRET` are optional runtime overrides (Workers). Vite still never inlines unprefixed names next to `DATABASE_URL`.
 
-- `FLOWLESS_URL`, `BRIDGE_SECRET` — same strings as above. Native only needs the Flowless **URL** and the bridge secret. Do not copy Flowless `AUTH=`, `TOKENS=`, or `EMAIL_TEMPLATES=` here.
+- `FLOWLESS_URL` — Flowless origin (optional if `PUBFLOW_PUBLIC_FLOWLESS_URL` is set). Alias: `FLOWLESS_API_URL`.
+- `BRIDGE_SECRET` — same public bridge string (optional if `PUBFLOW_PUBLIC_BRIDGE_SECRET` is set). Alias: `BRIDGE_VALIDATION_SECRET`.
+- Native only needs the Flowless **URL** and the bridge string. Do not copy Flowless `AUTH=`, `TOKENS=`, or `EMAIL_TEMPLATES=` here.
 - `PORT` — default `3000`
 - `DATABASE_URL` — empty is fine; the app starts without a database
 - `AUTH_VALIDATION_MODE` — `DISABLED` | `STANDARD` | `ADVANCED` | `STRICT` (see [Security](./security.md))

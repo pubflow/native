@@ -3,6 +3,7 @@ import { HTTPException } from 'hono/http-exception'
 import { getCookie } from 'hono/cookie'
 import { isAnyType, parseAllowedTypes, sessionAllowed, type ActionSession } from './access.ts'
 import { forbidClient } from './client-guard.ts'
+import { serverEnv } from './env.ts'
 import { applySessionSecurity } from './session-security.ts'
 
 forbidClient('@pubflow/native/auth')
@@ -32,11 +33,11 @@ function extractSessionId(c: Context): string | null {
 }
 
 function flowlessUrl(): string {
-  return (process.env.FLOWLESS_URL || process.env.FLOWLESS_API_URL || 'http://localhost:8787').replace(/\/$/, '')
+  return (serverEnv('FLOWLESS_URL') || serverEnv('FLOWLESS_API_URL') || 'http://localhost:8787').replace(/\/$/, '')
 }
 
 function bridgeSecret(): string {
-  return process.env.BRIDGE_VALIDATION_SECRET || process.env.BRIDGE_SECRET || ''
+  return serverEnv('BRIDGE_VALIDATION_SECRET') || serverEnv('BRIDGE_SECRET') || ''
 }
 
 async function flowlessValidate(sessionId: string): Promise<SessionData> {
