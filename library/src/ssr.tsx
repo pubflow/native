@@ -2,6 +2,7 @@ import { createElement } from 'react'
 import { renderToString } from 'react-dom/server'
 import { RouterProvider, createMemoryHistory } from '@tanstack/react-router'
 import type { Context } from 'hono'
+import { hydratePublicBootProcess, injectPublicBootHtml } from './env.ts'
 
 type HistoryLike = {
   location: { pathname: string; searchStr?: string; search?: string }
@@ -65,7 +66,8 @@ async function renderAppHtml(c: Context, getRouter: RouterFactory): Promise<stri
 }
 
 export async function renderPage(c: Context, getRouter: RouterFactory, indexHtml = '') {
+  hydratePublicBootProcess(c.env)
   const appHtml = await renderAppHtml(c, getRouter)
   const template = await loadTemplate(c, indexHtml)
-  return c.html(injectAppHtml(template, appHtml))
+  return c.html(injectPublicBootHtml(injectAppHtml(template, appHtml), c.env))
 }

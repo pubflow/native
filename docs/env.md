@@ -6,7 +6,7 @@ Keep `.env.example` short. Copy it, fill what you use, ignore the rest. Native a
 
 **Browser** (`PUBFLOW_PUBLIC_*` or `VITE_*` — same keys):
 
-- `FLOWLESS_URL` — Flowless origin
+- `FLOWLESS_URL` — Flowless origin. `API_BASE_URL` is this same URL. Worker runtime `PUBFLOW_PUBLIC_FLOWLESS_URL` is enough for the Google href (Native injects it into HTML). Vite build-time public env is optional.
 - `BRIDGE_SECRET` — public bridge string (same value as the server secret)
 - `APP_NAME`, `DEFAULT_THEME` (`system` / `light` / `dark`)
 - Optional: `DEFAULT_LANGUAGE` (locks one language, hides the toggle), `APP_LOGO`, `APP_LOGO_DARK`

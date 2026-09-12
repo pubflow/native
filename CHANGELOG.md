@@ -8,6 +8,10 @@ All notable changes to `@pubflow/native` are documented here. Breaking changes b
 - GitHub CI: unit tests, typecheck, `wrangler deploy --dry-run` size budget.
 - Docs: Native is for shipping a secure full-stack app faster (humans and AI); folders keep secrets off the client. Hyperdrive stays opt-in.
 
+## 1.0.5
+
+- HTML boot script: Worker `PUBFLOW_PUBLIC_FLOWLESS_URL` (same origin as `API_BASE_URL`) reaches the client. Unprefixed `FLOWLESS_URL` is optional.
+
 ## 1.0.0
 
 - First stable: Hono `fetch` + TanStack Router + Vite plugin. Pages in `app/pages`, queries in `app/api` / `app/actions`.

@@ -1,6 +1,6 @@
 {
   "name": "@pubflow/native",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Ship a secure full-stack TypeScript app faster. Pages and a Hono API as folders. Node, Bun, or Cloudflare Workers.",
   "type": "module",
   "license": "MIT",

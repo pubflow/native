@@ -1,4 +1,4 @@
-import { publicEnv } from '@pubflow/native/env'
+import { bootEnv, publicEnv } from '@pubflow/native/env'
 
 function parseList(value?: string): string[] {
   return String(value || '')
@@ -7,14 +7,22 @@ function parseList(value?: string): string[] {
     .filter(Boolean)
 }
 
+function flowlessUrl() {
+  return bootEnv('FLOWLESS_URL') || (import.meta.env.DEV ? 'http://localhost:8787' : '')
+}
+
 const lockedLanguage = publicEnv('DEFAULT_LANGUAGE')
 const multiLang = publicEnv('MULTI_LANG') !== 'false' && !lockedLanguage
 
 export const PUBFLOW_CONFIG = {
-  API_BASE_URL: publicEnv('FLOWLESS_URL') || 'http://localhost:8787',
+  get API_BASE_URL() {
+    return flowlessUrl()
+  },
   BRIDGE_BASE_PATH: publicEnv('BRIDGE_BASE_PATH') || '/bridge',
   AUTH_BASE_PATH: publicEnv('AUTH_BASE_PATH') || '/auth',
-  BRIDGE_SECRET: publicEnv('BRIDGE_SECRET') || '',
+  get BRIDGE_SECRET() {
+    return bootEnv('BRIDGE_SECRET') || ''
+  },
   APP_NAME: publicEnv('APP_NAME') || 'Pubflow Native',
   APP_LOGO: publicEnv('APP_LOGO') || '',
   APP_LOGO_DARK: publicEnv('APP_LOGO_DARK') || '',
