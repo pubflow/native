@@ -1,12 +1,14 @@
 # Why Pubflow Native
 
-Native is for shipping a **secure full-stack TypeScript app faster** — by you or with an AI. Pages and a Hono API are folders. Secrets stay off the client by default. One process to run and deploy.
+Native is for the gap from **idea to a live URL** — minutes, not an afternoon of config. You (or an AI) drop a React page in `app/pages` and a Hono app in `app/api`. Secrets stay off the client by default.
 
-It is not a new kind of framework. It is **Hono + TanStack Router + a Vite plugin**. You (or an agent) drop files in the right folders instead of choosing RSC vs server functions vs Route Handlers.
+It is not a new runtime. It is **Hono + TanStack Router + a Vite plugin** — production pieces, one convention. Plenty of frameworks put UI and API in one repo. Native is optimized for how fast that first page and `/api` route exist, then the same `fetch` on whatever host you pick.
 
-Use it when you want one TypeScript app: React in `app/pages`, queries and `DATABASE_URL` in `app/api` / `app/actions`. The server is Hono’s `fetch` — the same export on Node, Bun, and Cloudflare Workers.
+Use it when you want one TypeScript app: React in `app/pages`, queries and `DATABASE_URL` in `app/api` / `app/actions`. Hono’s `fetch` is the server on **Node, Bun, Docker, Nixpacks, a VPS, or Cloudflare Workers**. Workers is optional (`bun run deploy:cf`), not the product. See [Deploy](./deploy.md).
 
 Anyone can use it. It is not locked to Pubflow products. Flowless (login) is optional; Native is still React + Hono without it.
+
+This is the “many app ideas, little time” path. It is not a replacement for Next on a large product team.
 
 | Path | Use it when |
 | --- | --- |

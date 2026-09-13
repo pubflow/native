@@ -1,7 +1,7 @@
 {
   "name": "@pubflow/native",
   "version": "1.0.5",
-  "description": "Ship a secure full-stack TypeScript app faster. Pages and a Hono API as folders. Node, Bun, or Cloudflare Workers.",
+  "description": "Minutes from idea to a page + API. Hono + TanStack Router + Vite. Same fetch on Node, Bun, Docker, or Cloudflare Workers.",
   "type": "module",
   "license": "MIT",
   "repository": {

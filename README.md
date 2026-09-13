@@ -1,14 +1,17 @@
 # Pubflow Native
 
-**Full-stack TypeScript framework** — React pages and a Hono API in one process. One repo, one `dev`, one deploy.
+Ship a full-stack app in the time it takes to write the idea.
 
-UI (`app/pages`) and the server (`app/api`, `app/actions`) live together. A blog, a SaaS, an internal tool, or a new app — yours or built with an AI — without a frontend repo and a backend repo.
+Native is not a new runtime. It is **Hono + TanStack Router + Vite**, with folders so you (or an AI) drop a page and an API file and get something running in minutes — not an afternoon of config. Plenty of frameworks put React and an API in one repo. Native is for the gap from idea to a live URL.
 
-Secrets stay on the server. Pages cannot read `DATABASE_URL`. Queries and keys go in `app/api` or `app/actions`. The browser only sees `PUBFLOW_PUBLIC_*` / `VITE_*`.
+- `npx degit pubflow/native/starter my-app && bun install && bun run dev` — page + `/api`, no config file to invent first.
+- The same Hono `fetch` runs on **Node, Bun, Docker, Nixpacks** (Coolify / Railway / a VPS), or **Cloudflare Workers** (`bun run deploy:cf`). Workers is one host, not the product. [Deploy](docs/deploy.md).
+- Pages cannot import `getDb()` — the client build fails. Secrets stay on the server by construction.
+- This is for shipping TypeScript apps quickly (many ideas, little time). It is not a replacement for Next on a large product team.
 
-Login is optional. [Flowless](https://www.pubflow.com/products/flowless) is a trust layer: it knows **who** the user is and their **role** (admin, editor, …). The browser keeps a session id. Native asks Flowless if that session is valid, then you gate routes and Actions with `requireAuth` / `requireRole` — no extra auth stack, no secrets in the page. Skip Flowless and Native is still React + API.
+Login is optional. [Flowless](https://www.pubflow.com/products/flowless) is a trust layer: it knows **who** the user is and their **role**. Native asks Flowless if the session id is valid, then you gate routes and Actions with `requireAuth` / `requireRole`. Skip Flowless and Native is still React + Hono.
 
-Anyone can use it. It is **not** locked to Pubflow products. Want the stack comparison (Next, TanStack Start, HonoX)? See [Why Native](docs/why.md).
+Anyone can use it. It is **not** locked to Pubflow products. Stack comparison: [Why Native](docs/why.md).
 
 Package: [`@pubflow/native`](https://www.npmjs.com/package/@pubflow/native)
 
@@ -37,11 +40,14 @@ bun run dev
 [`npx degit`](https://github.com/unjs/degit) copies [`starter/`](https://github.com/pubflow/native/tree/master/starter) onto `my-app/` — same files you see in that GitHub tree, nothing else.
 
 ```bash
-bun run dev          # Vite + Hono (port 3000)
+bun run dev          # Vite + Hono (port 3000) — page + /api
 bun run build        # client + SSR
-bun run start        # node dist/server/node.js
-bun run deploy:cf    # Cloudflare Worker
+bun run start        # Node: dist/server/node.js
+bun run start:bun    # Bun: dist/server/bun.js
+bun run deploy:cf    # optional — Cloudflare Worker
 ```
+
+Node, Docker, and Nixpacks: [Deploy](docs/deploy.md). Workers is not required.
 
 The starter (Default) is a complete example: login/dashboard, Tailwind v4, and **shadcn already wired** (`components.json`, `cn()`, `@/` → `app/`, a few UI files). Add more with the official CLI — `npx shadcn@latest add dialog` — not `init -t vite`. **Delete or ignore auth** if you do not use Flowless — Native does not require it. `GET /` and your own `/api/*` routes work with no Pubflow services running.
 
@@ -138,9 +144,11 @@ See [`examples/`](examples/) — Minimal and Custom Hono are cloneable apps; Clo
 
 ## What it is for
 
-- UI and API in one TypeScript app — not two repos
-- Secrets and database access on the server (`/api`, Actions); pages cannot read `DATABASE_URL`
-- Flowless as a trust layer when you want login: session id in, who + role out; `requireAuth` / `requireRole` to limit what they can do
+- Minutes from idea to `bun run dev`: a page in `app/pages` and a Hono file in `app/api`
+- Same `fetch` on Node, Bun, Docker, Nixpacks, or Cloudflare Workers — pick the host
+- Hono + TanStack Router + Vite, not a new runtime
+- Secrets on the server; the client build fails if a page imports `getDb()`
+- Optional Flowless login: session id in, who + role out; `requireAuth` / `requireRole`
 - File routes you already know: `layout.tsx`, `index.tsx`, `[id].tsx`
 
 Native is web. For mobile use `pubflow create react-native` / Expo. For a non-TypeScript API use Go, Python, or Rust. For an MPA / islands app, HonoX. Details: [Why Native](docs/why.md).

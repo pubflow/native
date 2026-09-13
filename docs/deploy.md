@@ -1,6 +1,6 @@
 # Deploy
 
-One `vite build && vite build --ssr` emits every entry; pick the file your host runs. Cloudflare is the isolate path. Node, Bun, and Docker are the process path.
+Pick the host. One `vite build && vite build --ssr` emits every entry; run the file that host expects. **Cloudflare Workers is optional** (`bun run deploy:cf`). Node, Bun, Docker, Nixpacks (Coolify, Railway), and any VPS that can run Node or Bun are first-class. The product is the same Hono `fetch`, not a Workers-only stack.
 
 | Target | Entrypoint | Commands | Notes |
 | --- | --- | --- | --- |
@@ -13,8 +13,10 @@ One `vite build && vite build --ssr` emits every entry; pick the file your host 
 `wrangler.jsonc` in the app you cloned (Default, Minimal, or Custom Hono) — paths are local `dist/...`, not `examples/cloudflare-worker`:
 
 - `main`: `dist/server/worker.js`
-- `assets.directory`: `dist/client`
-- `run_worker_first`: true so HTML is SSR, not a static `index.html` SPA fallback
+- `assets.directory`: `dist/client` — Workers **Static Assets** (not a dynamic fetch that bills CPU per image). The Worker still SSR HTML (`run_worker_first`: true) so `/` is not a static SPA fallback.
+- `compatibility_flags`: `nodejs_compat` is already set in the starter (needed for `process.env` and many npm packages).
+- `bun run dev` is Vite. Before trusting a Workers deploy, run `bun run dev:cf` (`wrangler dev` on the production Worker build). The two runtimes are not identical.
+- Hyperdrive / KV `Env` types are not generated automatically (`wrangler types` is on you). The Hyperdrive block in `wrangler.jsonc` stays commented until you add an id.
 - No database: clone / Deploy to Cloudflare. Do not edit `wrangler.jsonc`.
 - Turso: Worker **runtime** secret `DATABASE_URL` (`libsql://...?authToken=`). HTTP. No Hyperdrive. Do not put this in Workers Builds / git CI.
 - Postgres / MySQL on Workers: create Hyperdrive, then uncomment the binding — [Hyperdrive](./hyperdrive.md). Not a TCP `pg` pool in the isolate. Node / Bun still use `DATABASE_URL` only.
